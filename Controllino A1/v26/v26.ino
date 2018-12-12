@@ -5,6 +5,11 @@
 #include <Ethernet.h>
 #include <PubSubClient.h>
 
+template<typename T, size_t SIZE>
+size_t getSize(T (&)[SIZE]) {
+    return SIZE;
+}
+
 byte Mac[]        = {    0xAE, 0xED, 0xBA, 0xFE, 0xFE, 0xC1 };
 IPAddress Ip(192, 168, 1, 91);
 IPAddress Servers(192, 168, 1, 10);
@@ -38,29 +43,38 @@ int switch_12[] = {CONTROLLINO_D12};
 int switch_13[] = {CONTROLLINO_D13};
 int switch_14[] = {CONTROLLINO_D14};
 int switch_15[] = {CONTROLLINO_D15};
-int switch_16[] = {};
-int switch_17[] = {};
-int switch_18[] = {};
-int switch_19[] = {};
-int switch_20[] = {};
-int switch_21[] = {};
-int switch_22[] = {};
-int switch_23[] = {};
 
+
+
+int *point_switch_0  = switch_0;
+int *point_switch_1  = switch_1;
+int *point_switch_2  = switch_2;
+int *point_switch_3  = switch_3;
+int *point_switch_4  = switch_4;
+int *point_switch_5  = switch_5;
+int *point_switch_6  = switch_6;
+int *point_switch_7  = switch_7;
+int *point_switch_8  = switch_8;
+int *point_switch_9  = switch_9;
+int *point_switch_10 = switch_10;
+int *point_switch_11 = switch_11;
+int *point_switch_12 = switch_12;
+int *point_switch_13 = switch_13;
+int *point_switch_14 = switch_14;
+int *point_switch_15 = switch_15;
 
 
 int switch_matrix[][16]={
   {CONTROLLINO_A0,CONTROLLINO_A1,CONTROLLINO_A2,CONTROLLINO_A3,CONTROLLINO_A4,CONTROLLINO_A5,CONTROLLINO_A6,CONTROLLINO_A7,CONTROLLINO_A8,CONTROLLINO_A9,CONTROLLINO_A10,CONTROLLINO_A11,CONTROLLINO_A12,CONTROLLINO_A13,CONTROLLINO_A14,CONTROLLINO_A15},
-  {&switch_0,&switch_1,&switch_2,&switch_3,&switch_4,&switch_5,&switch_6,&switch_7,&switch_8,&switch_9,&switch_10,&switch_11,&switch_12,&switch_13,&switch_14,&switch_15}
+  {*point_switch_0,*point_switch_1,*point_switch_2,*point_switch_3,*point_switch_4,*point_switch_5,*point_switch_6,*point_switch_7,*point_switch_8,*point_switch_9,*point_switch_10,*point_switch_11,*point_switch_12,*point_switch_13,*point_switch_14,*point_switch_15}
 };
 
 void toggle(int index ){
     int value = switch_matrix[1][index];
-    int lightArray = sizeof(value)/sizeof(value[0]);
+    // int lightArray = sizeof(value)/sizeof(value[0]);
 
-    for (int i=0; i<lightArray;i++) {
-      digitalRead(value[i]);
-    }
+    Serial.print(value);
+    Serial.print("\n");
 }
 
 void digitalLightSwitch(int index ){
