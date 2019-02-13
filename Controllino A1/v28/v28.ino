@@ -349,7 +349,7 @@ void lightSwitch(int index ){
 
       state_switch_matrix[index2][0] = output_index;
       state_switch_matrix[index2][1] = millis();
-
+      toggle(index2);
 
 
     }
@@ -405,33 +405,29 @@ void setup() {
   for(int i=0; i<input_analog_size; i++){
     pinMode(input_analog[i],INPUT);
   }
-  
-
-  // TEST
-  //digitalWrite(CONTROLLINO_D14, LOW);   
-  //digitalWrite(CONTROLLINO_D15, LOW);
-}
+  }
 
 void loop() {
   long cap = millis();
   //INITIATE MAJOR TIMER
   CurrentTime = millis(); //Set initial timer
 
+  // Test of pushing A0 button
+  // ***** to be removed *****
+  //digitalWrite(input_analog[i], HIGH);
+
   // Button press detection
   if ((CurrentTime - PreviousTime1) >= 50) {        
     PreviousTime1 = CurrentTime;
     for (int i=0; i<input_analog_size;i++) {
-      // Test of pushing A0 button
-      // ***** to be removed *****
-      //digitalWrite(input_analog[i], HIGH);
       
       lightSwitch(input_analog[i]);
       
+      delay(2);
+    }
       // Test of pushing A0 button
       // ***** to be removed *****
       //digitalWrite(input_analog[i], LOW);
-      delay(2);
-    }
   }
 
 
