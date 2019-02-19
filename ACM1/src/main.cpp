@@ -1,4 +1,5 @@
 
+ 
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Controllino.h>
@@ -17,8 +18,10 @@
 
 
 // MQTT setup
+// const int BUTTONS_TOTAL = 7;
+
 byte mac[] = {0xDE, 0xED, 0xBA, 0xFE, 0xAF, 0xA1};
-IPAddress ip(192, 168, 1, 81);
+IPAddress ip(192, 168, 1, 80);
 IPAddress server(192, 168, 1, 10);
 
 EthernetClient ethClient;
@@ -27,33 +30,34 @@ long lastReconnectAttempt = 0;
 
 
 // set how many buttons you have connected
+
 const int BUTTONS_TOTAL = 7;
 const int BUTTONS_VALUES_1[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 
 
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length) {
-    // const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 50;
-    // DynamicJsonBuffer jsonBuffer(capacity);
+    const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 50;
+    DynamicJsonBuffer jsonBuffer(capacity);
 
     // const char *json = "{\"action\":\"toggle\",\"output\":[1,2,3,4,9,9,9,9,9,9]}";
     // JsonObject& root = jsonBuffer.parseObject(json);
 
     // handle message arrived
-    Serial.print("[");
-    Serial.print(topic);
-    Serial.print("] ");
-    for (unsigned int i = 0; i < length; i++)
-    {
-        Serial.print((char)payload[i]);
-    }
-    Serial.println();
-
-    // JsonObject &root = jsonBuffer.parseObject(payload);
-    // if (root.success()){
-    //     const char* action = root["action"];
-    //     Serial.println(action);
+    // Serial.print("[");
+    // Serial.print(topic);
+    // Serial.print("] ");
+    // for (unsigned int i = 0; i < length; i++)
+    // {
+    //     Serial.print((char)payload[i]);
     // }
+    // Serial.println();
+
+    JsonObject &root = jsonBuffer.parseObject(payload);
+    if (root.success()){
+        const char* action = root["action"];
+        Serial.println(action);
+    }
 
     // payload[length] = '\0';
     // String s = String((char *)payload);
@@ -238,3 +242,5 @@ void onButtonReleased(Button &btn, uint16_t duration)
     Serial.print(duration);
     Serial.println(" ms");
 }
+
+/***/
