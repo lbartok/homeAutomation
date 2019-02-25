@@ -2,6 +2,10 @@
 	"folders": [
 		{
 			"path": "ACM1"
+		},
+		{
+			"path": "C:\\Users\\barto\\Documents\\PlatformIO\\Projects\\Ethernet shield project - analog button",
+			"name": "Ethernet shield project - analog button"
 		}
 	],
 	"settings": {

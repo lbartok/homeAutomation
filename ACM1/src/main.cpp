@@ -70,11 +70,6 @@ boolean reconnect() {
     // Serial.println("Attempting deviceACM1 - MQTT connection ...");
     if (client.connect("deviceACM1"))
     {
-        Serial.print(lastReconnectAttempt);
-        Serial.print(" NOw:");
-        Serial.print(millis());
-        Serial.println(" - Connected...");
-
         // Once connected, publish an announcement...
         client.publish("ACM1", "{\"action\":\"info\"}");
         // ... and resubscribe
