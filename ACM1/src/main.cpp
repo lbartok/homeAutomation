@@ -20,7 +20,7 @@
 // MQTT setup
 // const int BUTTONS_TOTAL = 7;
 
-byte mac[] = {0xDE, 0xED, 0xBA, 0xFE, 0xAF, 0xA1};
+byte mac[] = {0xDE, 0xED, 0xBB, 0xFE, 0xAF, 0xBB};
 IPAddress ip(192, 168, 1, 80);
 IPAddress server(192, 168, 1, 10);
 
@@ -34,6 +34,10 @@ long lastReconnectAttempt = 0;
 const int BUTTONS_TOTAL = 7;
 const int BUTTONS_VALUES_1[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 
+void toggle(int pin)
+{
+    digitalWrite(pin, !digitalRead(pin));
+}
 
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length) {
@@ -57,13 +61,60 @@ void callback(char *topic, byte *payload, unsigned int length) {
     if (root.success()){
         const char* action = root["action"];
         Serial.println(action);
-    }
 
-    // payload[length] = '\0';
-    // String s = String((char *)payload);
-    // Serial.println(s);
-    
-    Serial.println("-------------------------");
+        if (action == "toggle")
+        {
+
+            for (unsigned int i = 0; i < root["output"].size(); i++)
+            {
+                const int button = root["output"][i];
+                if (button != 0)
+                {
+                    toggle(button);
+                    Serial.print(button);
+                    Serial.print("--");
+                    Serial.println(digitalRead(button));
+                }
+            }
+        }
+
+        if (action == "roletyHore")
+        {
+            digitalWrite(CONTROLLINO_R2, HIGH);
+            digitalWrite(CONTROLLINO_R3, LOW);
+            digitalWrite(CONTROLLINO_R4, HIGH);
+            digitalWrite(CONTROLLINO_R5, LOW);
+            digitalWrite(CONTROLLINO_R6, HIGH);
+            digitalWrite(CONTROLLINO_R7, LOW);
+            digitalWrite(CONTROLLINO_R8, HIGH);
+            digitalWrite(CONTROLLINO_R9, LOW);
+            digitalWrite(CONTROLLINO_R10, HIGH);
+            digitalWrite(CONTROLLINO_R11, LOW);
+            digitalWrite(CONTROLLINO_R12, HIGH);
+            digitalWrite(CONTROLLINO_R13, LOW);
+            Serial.println("R Hore");
+        }
+        if (action == "roletyDole")
+        {
+            digitalWrite(CONTROLLINO_R2, HIGH);
+            digitalWrite(CONTROLLINO_R3, HIGH);
+            digitalWrite(CONTROLLINO_R4, HIGH);
+            digitalWrite(CONTROLLINO_R5, HIGH);
+            digitalWrite(CONTROLLINO_R6, HIGH);
+            digitalWrite(CONTROLLINO_R7, HIGH);
+            digitalWrite(CONTROLLINO_R8, HIGH);
+            digitalWrite(CONTROLLINO_R9, HIGH);
+            digitalWrite(CONTROLLINO_R10, HIGH);
+            digitalWrite(CONTROLLINO_R11, HIGH);
+            digitalWrite(CONTROLLINO_R12, HIGH);
+            digitalWrite(CONTROLLINO_R13, HIGH);
+            Serial.println("R Dole");
+        }
+
+        Serial.println("--------- ----------- Success -----------------------");
+    } else {
+        Serial.println("--------- ----------- FAIL!!! -----------------------");
+    }
 }
 
 boolean reconnect() {
@@ -77,6 +128,7 @@ boolean reconnect() {
     }
     return client.connected();
 }
+
 
 // you can also define constants for each of your buttons, which makes your code easier to read
 // define these in the same order as the numbers in your BUTTONS_VALUES array, so whichever button has the smallest analogRead() number should come first
@@ -157,11 +209,26 @@ void setup()
     // When the button is first pressed, call the function onButtonPressed (further down the page)
     buttonIN0.onPress(onButtonPressedIN0);
     buttonIN1.onPress(onButtonPressedIN1);
+
+    pinMode(CONTROLLINO_R2, OUTPUT);
+    pinMode(CONTROLLINO_R3, OUTPUT);
+    pinMode(CONTROLLINO_R4, OUTPUT);
+    pinMode(CONTROLLINO_R5, OUTPUT);
+    pinMode(CONTROLLINO_R6, OUTPUT);
+    pinMode(CONTROLLINO_R7, OUTPUT);
+    pinMode(CONTROLLINO_R8, OUTPUT);
+    pinMode(CONTROLLINO_R9, OUTPUT);
+    pinMode(CONTROLLINO_R10, OUTPUT);
+    pinMode(CONTROLLINO_R11, OUTPUT);
+    pinMode(CONTROLLINO_R12, OUTPUT);
+    pinMode(CONTROLLINO_R13, OUTPUT);
 }
 
 void loop()
 {
-// Analog
+
+
+    // Analog
     buttonsA6.update();
         // D7           @ACM0
         // D8           @ACM0
@@ -194,7 +261,87 @@ void loop()
     buttonI18.update(); // D10 @ACM0
 
 
-// MQTT connect & reconnect
+// Chrck if pressed
+    // if (buttonsA7.onPress(0))
+    // {
+    //     Serial.println("Button 0 is pressed");
+    // }
+// Chrck if pressed
+    if (buttonsA7.onPress(1))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[3,5,9,10,45]}");
+        client.subscribe("ACM1");
+        Serial.println("Button 1 is pressed");
+    }
+// Chrck if pressed
+    if (buttonsA7.onPress(2))
+    {
+        Serial.println("Button 2 is pressed");
+    }
+// Chrck if pressed
+    if (buttonsA7.onPress(3))
+    {
+        // R2, R3 | R4 , R5 | R6, R7 | R8, R9 | R10, R11 | R12, R13
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[24,25,26,27,28,29,30,31,32,33,34,35]}");
+        client.subscribe("ACM1");
+        Serial.println("Button 3 is pressed Roleta Dole");
+    }
+// Chrck if pressed
+    if (buttonsA7.onPress(4))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[24,26,28,30,32,34]}");
+        client.subscribe("ACM1");
+        Serial.println("Button 4 is pressed  Roleta hore");
+    }
+// Chrck if pressed
+    if (buttonsA7.onPress(5))
+    {
+        Serial.println("Button 5 is pressed");
+    }
+// Chrck if pressed
+    if (buttonsA7.onPress(6))
+    {
+        Serial.println("Button 6 is pressed");
+    }
+
+    // Chrck if pressed
+    // if (buttonsA6.onPress(0))
+    // {
+    //     Serial.println("Button 0 is pressed");
+    // }
+    // Chrck if pressed
+    if (buttonsA6.onPress(1))
+    {
+        Serial.println("Button buttonsA6 1 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.onPress(2))
+    {
+        Serial.println("Button buttonsA6 2 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.onPress(3))
+    {
+        Serial.println("Button buttonsA6 3 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.onPress(4))
+    {
+        Serial.println("Button buttonsA6 4 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.onPress(5))
+    {
+        Serial.println("Button buttonsA6 5 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.onPress(6))
+    {
+        Serial.println("Button buttonsA6 6 is pressed");
+    }
+
+
+    // MQTT connect & reconnect
     if (!client.connected())
     {
         long now = millis();

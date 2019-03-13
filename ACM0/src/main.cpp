@@ -182,7 +182,19 @@ void setup()
 
 void loop()
 {
-// Analog
+
+    int A6 = analogRead(CONTROLLINO_A6);
+    if (A6!=0){
+        Serial.println('A6: '+A6);
+    }
+
+    int A7 = analogRead(CONTROLLINO_A7);
+    if (A7 != 0)
+    {
+        Serial.println('A6: ' + A6);
+    }
+
+    // Analog
     buttonsA6.update();
         // D7           @ACM0
         // D8           @ACM0
@@ -215,7 +227,80 @@ void loop()
     buttonI18.update(); // D10 @ACM0
 
 
-// MQTT connect & reconnect
+// Chrck if pressed
+    // if (buttonsA7.isPressed(0))
+    // {
+    //     Serial.println("Button 0 is pressed");
+    // }
+// Chrck if pressed
+    if (buttonsA7.isPressed(1))
+    {
+        Serial.println("Button 1 is pressed");
+    }
+// Chrck if pressed
+    if (buttonsA7.isPressed(2))
+    {
+        Serial.println("Button 2 is pressed");
+    }
+// Chrck if pressed
+    if (buttonsA7.isPressed(3))
+    {
+        Serial.println("Button 3 is pressed");
+    }
+// Chrck if pressed
+    if (buttonsA7.isPressed(4))
+    {
+        Serial.println("Button 4 is pressed");
+    }
+// Chrck if pressed
+    if (buttonsA7.isPressed(5))
+    {
+        Serial.println("Button 5 is pressed");
+    }
+// Chrck if pressed
+    if (buttonsA7.isPressed(6))
+    {
+        Serial.println("Button 6 is pressed");
+    }
+
+    // Chrck if pressed
+    // if (buttonsA6.isPressed(0))
+    // {
+    //     Serial.println("Button 0 is pressed");
+    // }
+    // Chrck if pressed
+    if (buttonsA6.isPressed(1))
+    {
+        Serial.println("Button buttonsA6 1 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.isPressed(2))
+    {
+        Serial.println("Button buttonsA6 2 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.isPressed(3))
+    {
+        Serial.println("Button buttonsA6 3 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.isPressed(4))
+    {
+        Serial.println("Button buttonsA6 4 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.isPressed(5))
+    {
+        Serial.println("Button buttonsA6 5 is pressed");
+    }
+    // Chrck if pressed
+    if (buttonsA6.isPressed(6))
+    {
+        Serial.println("Button buttonsA6 6 is pressed");
+    }
+
+
+    // MQTT connect & reconnect
     if (!client.connected())
     {
         long now = millis();
