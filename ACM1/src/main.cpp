@@ -41,7 +41,7 @@ void toggle(int pin)
 
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length) {
-    const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 50;
+    const size_t capacity = JSON_ARRAY_SIZE(20) + JSON_OBJECT_SIZE(2) + 50;
     DynamicJsonBuffer jsonBuffer(capacity);
 
     // const char *json = "{\"action\":\"toggle\",\"output\":[1,2,3,4,9,9,9,9,9,9]}";
@@ -57,12 +57,12 @@ void callback(char *topic, byte *payload, unsigned int length) {
     // }
     // Serial.println();
 
-    JsonObject &root = jsonBuffer.parseObject(payload);
+    JsonObject& root = jsonBuffer.parseObject(payload);
     if (root.success()){
         const char* action = root["action"];
         Serial.println(action);
 
-        if (action == "toggle")
+        if (strcmp(action, "toggle")==0 )
         {
 
             for (unsigned int i = 0; i < root["output"].size(); i++)
@@ -76,9 +76,12 @@ void callback(char *topic, byte *payload, unsigned int length) {
                     Serial.println(digitalRead(button));
                 }
             }
+            Serial.println("-- Executed");
         }
 
-        if (action == "roletyHore")
+        Serial.println(strcmp(action, "roletyHore"));
+
+            if (strcmp(action, "roletyHore")==0)
         {
             digitalWrite(CONTROLLINO_R2, HIGH);
             digitalWrite(CONTROLLINO_R3, LOW);
@@ -94,7 +97,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
             digitalWrite(CONTROLLINO_R13, LOW);
             Serial.println("R Hore");
         }
-        if (action == "roletyDole")
+        if (strcmp(action, "roletyDole") ==0)
         {
             digitalWrite(CONTROLLINO_R2, HIGH);
             digitalWrite(CONTROLLINO_R3, HIGH);
@@ -171,7 +174,9 @@ void onButtonPressedIN0(Button &btn)
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
 void onButtonPressedIN1(Button &btn)
 {
-    Serial.println("button pressed");
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[3]}");
+    client.subscribe("ACM1");
+    Serial.println("button IN1 pressed");
 }
 
 void setup()
@@ -269,7 +274,7 @@ void loop()
 // Chrck if pressed
     if (buttonsA7.onPress(1))
     {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[3,5,9,10,45]}");
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[5,9,10,45]}");
         client.subscribe("ACM1");
         Serial.println("Button 1 is pressed");
     }
@@ -282,14 +287,15 @@ void loop()
     if (buttonsA7.onPress(3))
     {
         // R2, R3 | R4 , R5 | R6, R7 | R8, R9 | R10, R11 | R12, R13
-        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[24,25,26,27,28,29,30,31,32,33,34,35]}");
+        // client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[24,25,26,27,28,29,30,31,32,33,34,35]}");
+        client.publish("ACM1", "{\"action\":\"roletyDole\"}");
         client.subscribe("ACM1");
         Serial.println("Button 3 is pressed Roleta Dole");
     }
 // Chrck if pressed
     if (buttonsA7.onPress(4))
     {
-        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[24,26,28,30,32,34]}");
+        client.publish("ACM1", "{\"action\":\"roletyHore\"}");
         client.subscribe("ACM1");
         Serial.println("Button 4 is pressed  Roleta hore");
     }
