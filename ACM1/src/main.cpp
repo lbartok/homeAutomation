@@ -168,7 +168,10 @@ void configurePushButton(Bounce &bouncedButton)
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
 void onButtonPressedIN0(Button &btn)
 {
-    Serial.println("button pressed");
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[11]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button IN0 pressed");
 }
 
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
@@ -176,7 +179,163 @@ void onButtonPressedIN1(Button &btn)
 {
     client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[3]}");
     client.subscribe("ACM1");
-    Serial.println("button IN1 pressed");
+    Serial.print(btn);
+    Serial.println(" button IN1 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA13(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[13, 44]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A13 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA14(Button &btn)
+{
+    client.publish("ACM1", "{\"action\":\"roletyHore\"}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A14 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA15(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[45]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A15 pressed");
+}
+                   
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedI16(Button &btn)
+{
+    client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[3]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button I16 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedI17(Button &btn)
+{
+    client.publish("ACM1", "{\"action\":\"roletyDole\"}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button I17 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedI18(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[12]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button I18 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA8(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[6]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A8 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA9(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[2]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A9 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA10(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[5]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A10 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA11(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[7]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A11 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA12(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[7]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A12 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA5(Button &btn)
+{
+    client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[78]}");
+    client.subscribe("ACM1");
+    Serial.print(btn);
+    Serial.println(" button A5 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA6(Button &btn)
+{
+    // Check if pressed
+    if (btn = 1)
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[9]}");
+        client.subscribe("ACM1");
+        Serial.println("Button buttonsA6 1 is pressed");
+    }
+    // Check if pressed
+    if (btn = 2)
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[10]}");
+        client.subscribe("ACM1");
+        Serial.println("Button buttonsA6 2 is pressed");
+    }
+    // Check if pressed
+    if (btn = 3)
+    {
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z6_dole]}");
+        client.subscribe("ACM1");
+        Serial.println("Button buttonsA6 3 is pressed");
+    }
+    // Check if pressed
+    if (btn = 4)
+    {
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z6_hore]}");
+        client.subscribe("ACM1");
+        Serial.println("Button buttonsA6 4 is pressed");
+    }
+    // Check if pressed
+    if (btn = 5)
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[12]}");
+        client.subscribe("ACM1");
+        Serial.println("Button buttonsA6 5 is pressed");
+    }
+    // Check if pressed
+    if (btn = 6)
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[7]}");
+        client.subscribe("ACM1");
+        Serial.println("Button buttonsA6 6 is pressed");
+    }
 }
 
 void setup()
@@ -199,6 +358,7 @@ void setup()
     // Configure the button as you'd like - not necessary if you're happy with the defaults
     buttonIN0.configureButton(configurePushButton);
     buttonIN1.configureButton(configurePushButton);
+    buttonA5.configureButton(configurePushButton);
     buttonA8.configureButton(configurePushButton);
     buttonA9.configureButton(configurePushButton);
     buttonA10.configureButton(configurePushButton);
@@ -214,6 +374,21 @@ void setup()
     // When the button is first pressed, call the function onButtonPressed (further down the page)
     buttonIN0.onPress(onButtonPressedIN0);
     buttonIN1.onPress(onButtonPressedIN1);
+    buttonA13.onPress(onButtonPressedA13);
+    buttonA14.onPress(onButtonPressedA14);
+    buttonA15.onPress(onButtonPressedA15);
+    buttonI16.onPress(onButtonPressedI16);
+    buttonI17.onPress(onButtonPressedI17);
+    buttonI18.onPress(onButtonPressedI18);
+    buttonA8.onPress(onButtonPressedA8);
+    buttonA9.onPress(onButtonPressedA9);
+    buttonA10.onPress(onButtonPressedA10);
+    buttonA11.onPress(onButtonPressedA11);
+    buttonA12.onPress(onButtonPressedA12);
+    buttonA5.onPress(onButtonPressedA5);
+ 
+    // Tryout if it will work this way. If not, needs to be removed and section in loop used
+    buttonsA6.onPress(onButtonPressedA6);
 
     pinMode(CONTROLLINO_R2, OUTPUT);
     pinMode(CONTROLLINO_R3, OUTPUT);
@@ -253,6 +428,7 @@ void loop()
 // Digital
     buttonIN0.update(); // D9 @ACM0
     buttonIN1.update(); // D1 @ACM0
+    buttonA5.update();
     buttonA8.update();
     buttonA9.update();
     buttonA10.update();
@@ -266,24 +442,26 @@ void loop()
     buttonI18.update(); // D10 @ACM0
 
 
-// Chrck if pressed
+// Check if pressed
     // if (buttonsA7.onPress(0))
     // {
     //     Serial.println("Button 0 is pressed");
     // }
-// Chrck if pressed
+// Check if pressed
     if (buttonsA7.onPress(1))
     {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[5,9,10,45]}");
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[13, 44]}");
         client.subscribe("ACM1");
         Serial.println("Button 1 is pressed");
     }
-// Chrck if pressed
+// Check if pressed
     if (buttonsA7.onPress(2))
     {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[12]}");
+        client.subscribe("ACM1");
         Serial.println("Button 2 is pressed");
     }
-// Chrck if pressed
+// Check if pressed
     if (buttonsA7.onPress(3))
     {
         // R2, R3 | R4 , R5 | R6, R7 | R8, R9 | R10, R11 | R12, R13
@@ -292,24 +470,29 @@ void loop()
         client.subscribe("ACM1");
         Serial.println("Button 3 is pressed Roleta Dole");
     }
-// Chrck if pressed
+// Check if pressed
     if (buttonsA7.onPress(4))
     {
         client.publish("ACM1", "{\"action\":\"roletyHore\"}");
         client.subscribe("ACM1");
         Serial.println("Button 4 is pressed  Roleta hore");
     }
-// Chrck if pressed
+// Check if pressed
     if (buttonsA7.onPress(5))
     {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[80]}");
+        client.subscribe("ACM1");
         Serial.println("Button 5 is pressed");
     }
-// Chrck if pressed
+// Check if pressed
     if (buttonsA7.onPress(6))
     {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[8, 9]}");
+        client.subscribe("ACM1");
         Serial.println("Button 6 is pressed");
     }
 
+ /* Moved this section up to where the button pressed is defined
     // Chrck if pressed
     // if (buttonsA6.onPress(0))
     // {
@@ -345,7 +528,7 @@ void loop()
     {
         Serial.println("Button buttonsA6 6 is pressed");
     }
-
+*/
 
     // MQTT connect & reconnect
     if (!client.connected())
