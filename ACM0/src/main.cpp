@@ -103,22 +103,19 @@ boolean reconnect() {
 // define these in the same order as the numbers in your BUTTONS_VALUES array, so whichever button has the smallest analogRead() number should come first
 
 // make an AnalogMultiButton object, pass in the pin, total and values array
-AnalogMultiButton buttonsA6(CONTROLLINO_A6, BUTTONS_TOTAL, BUTTONS_VALUES_1);
-AnalogMultiButton buttonsA7(CONTROLLINO_A7, BUTTONS_TOTAL, BUTTONS_VALUES_1);
+AnalogMultiButton buttonsA0(CONTROLLINO_A0, BUTTONS_TOTAL, BUTTONS_VALUES_1);
+AnalogMultiButton buttonsA1(CONTROLLINO_A1, BUTTONS_TOTAL, BUTTONS_VALUES_1);
+AnalogMultiButton buttonsA2(CONTROLLINO_A2, BUTTONS_TOTAL, BUTTONS_VALUES_1);
+AnalogMultiButton buttonsA4(CONTROLLINO_A4, BUTTONS_TOTAL, BUTTONS_VALUES_1);
+AnalogMultiButton buttonsA13(CONTROLLINO_A13, BUTTONS_TOTAL, BUTTONS_VALUES_1);
+AnalogMultiButton buttonsA14(CONTROLLINO_A14, BUTTONS_TOTAL, BUTTONS_VALUES_1);
+AnalogMultiButton buttonsA15(CONTROLLINO_A15, BUTTONS_TOTAL, BUTTONS_VALUES_1);
 
-PushButton buttonIN0 = PushButton(CONTROLLINO_IN0, PRESSED_WHEN_HIGH);
-PushButton buttonIN1 = PushButton(CONTROLLINO_IN1, PRESSED_WHEN_HIGH);
+PushButton buttonA5 = PushButton(CONTROLLINO_A5, PRESSED_WHEN_HIGH);
+PushButton buttonA6 = PushButton(CONTROLLINO_A6, PRESSED_WHEN_HIGH);
+PushButton buttonA7 = PushButton(CONTROLLINO_A7, PRESSED_WHEN_HIGH);
 PushButton buttonA8  = PushButton(CONTROLLINO_A8,  PRESSED_WHEN_HIGH);
 PushButton buttonA9  = PushButton(CONTROLLINO_A9,  PRESSED_WHEN_HIGH);
-PushButton buttonA10 = PushButton(CONTROLLINO_A10, PRESSED_WHEN_HIGH);
-PushButton buttonA11 = PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH);
-PushButton buttonA12 = PushButton(CONTROLLINO_A12, PRESSED_WHEN_HIGH);
-PushButton buttonA13 = PushButton(CONTROLLINO_A13, PRESSED_WHEN_HIGH);
-PushButton buttonA14 = PushButton(CONTROLLINO_A14, PRESSED_WHEN_HIGH);
-PushButton buttonA15 = PushButton(CONTROLLINO_A15, PRESSED_WHEN_HIGH);
-PushButton buttonI16 = PushButton(CONTROLLINO_I16, PRESSED_WHEN_HIGH);
-PushButton buttonI17 = PushButton(CONTROLLINO_I17, PRESSED_WHEN_HIGH);
-PushButton buttonI18 = PushButton(CONTROLLINO_I18, PRESSED_WHEN_HIGH);
 
 // pass a fourth parameter to set the debounce time in milliseconds
 // this defaults to 20 and can be increased if you're working with particularly bouncy buttons
@@ -132,15 +129,48 @@ void configurePushButton(Bounce &bouncedButton)
 }
 
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
-void onButtonPressedIN0(Button &btn)
+void onButtonPressedA5(Button &btn)
 {
-    Serial.println("button pressed");
+    client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[2]}");
+    client.subscribe("ACM0");
+    Serial.print(btn);
+    Serial.println(" button A5 pressed");
 }
 
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
-void onButtonPressedIN1(Button &btn)
+void onButtonPressedA6(Button &btn)
 {
-    Serial.println("button pressed");
+    client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[8]}");
+    client.subscribe("ACM0");
+    Serial.print(btn);
+    Serial.println(" button A6 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA7(Button &btn)
+{
+    client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[13]}");
+    client.subscribe("ACM0");
+    Serial.print(btn);
+    Serial.println(" button A7 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA8(Button &btn)
+{
+    client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[42]}");
+    client.subscribe("ACM0");
+    Serial.print(btn);
+    Serial.println(" button A8 pressed");
+}
+
+// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
+void onButtonPressedA9(Button &btn)
+{
+    client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[12]}");
+    client.subscribe("ACM0");
+    Serial.print(btn);
+    Serial.println(" button A9 pressed");
 }
 
 void setup()
@@ -161,146 +191,340 @@ void setup()
     lastReconnectAttempt = 0;
 
     // Configure the button as you'd like - not necessary if you're happy with the defaults
-    buttonIN0.configureButton(configurePushButton);
-    buttonIN1.configureButton(configurePushButton);
+    buttonA5.configureButton(configurePushButton);
+    buttonA6.configureButton(configurePushButton);
+    buttonA7.configureButton(configurePushButton);
     buttonA8.configureButton(configurePushButton);
     buttonA9.configureButton(configurePushButton);
-    buttonA10.configureButton(configurePushButton);
-    buttonA11.configureButton(configurePushButton);
-    buttonA12.configureButton(configurePushButton);
-    buttonA13.configureButton(configurePushButton);
-    buttonA14.configureButton(configurePushButton);
-    buttonA15.configureButton(configurePushButton);
-    buttonI16.configureButton(configurePushButton);
-    buttonI17.configureButton(configurePushButton);
-    buttonI18.configureButton(configurePushButton);
 
     // When the button is first pressed, call the function onButtonPressed (further down the page)
-    buttonIN0.onPress(onButtonPressedIN0);
-    buttonIN1.onPress(onButtonPressedIN1);
+    buttonA5.onPress(onButtonPressedA5);
+    buttonA6.onPress(onButtonPressedA6);
+    buttonA7.onPress(onButtonPressedA7);
+    buttonA8.onPress(onButtonPressedA8);
+    buttonA9.onPress(onButtonPressedA9);
 }
 
 void loop()
 {
-
-    int A6 = analogRead(CONTROLLINO_A6);
-    if (A6!=0){
-        Serial.println('A6: '+A6);
-    }
-
-    int A7 = analogRead(CONTROLLINO_A7);
-    if (A7 != 0)
-    {
-        Serial.println('A6: ' + A6);
-    }
-
     // Analog
-    buttonsA6.update();
-        // D7           @ACM0
-        // D8           @ACM0
-        // R10 & R11    @ACM1
-        // R10          @ACM1
-        // R10          @ACM1
-        // R10          @ACM1
+    buttonsA0.update();
+    buttonsA1.update(); 
+    buttonsA2.update(); 
+    buttonsA4.update(); 
+    buttonsA13.update(); 
+    buttonsA14.update(); 
+    buttonsA15.update(); 
 
-    buttonsA7.update(); 
-        // D11 & D14    @ACM0
-        // D10          @ACM0
-        // R10 & R11    @ACM1
-        // R10          @ACM1
-        // D23          @ACM0
-        // D6 & D7      @ACM0
-
-// Digital
-    buttonIN0.update(); // D9 @ACM0
-    buttonIN1.update(); // D1 @ACM0
+    // Digital
+    buttonA5.update(); // D9 @ACM0
+    buttonA6.update(); // D1 @ACM0
+    buttonA7.update();
     buttonA8.update();
     buttonA9.update();
-    buttonA10.update();
-    buttonA11.update();
-    buttonA12.update();
-    buttonA13.update();
-    buttonA14.update(); // R10, R12 @ACM1
-    buttonA15.update(); // D15
-    buttonI16.update(); // D1 @ACM1
-    buttonI17.update(); // R10,R11, R12,R13 @ACM1
-    buttonI18.update(); // D10 @ACM0
 
+// buttonsA0
+// Check if pressed
+    if (buttonsA0.onPress(1))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[5, 6]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A0-1 is pressed");
+    }
+// Check if pressed
+    if (buttonsA0.onPress(2))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[5, 6]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A0-2 is pressed");
+    }
+// Check if pressed
+    if (buttonsA0.onPress(3))
+    {
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z3dole]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A0-3 is pressed");
+    }
+// Check if pressed
+    if (buttonsA0.onPress(4))
+    {
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z3hore]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A0-4 is pressed");
+    } 
+// Check if pressed
+    if (buttonsA0.onPress(5))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[11]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A0-5 is pressed");
+    }
+// Check if pressed
+    if (buttonsA0.onPress(6))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[9]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A0-6 is pressed");
+    } 
 
-// Chrck if pressed
-    // if (buttonsA7.isPressed(0))
-    // {
-    //     Serial.println("Button 0 is pressed");
-    // }
-// Chrck if pressed
-    if (buttonsA7.isPressed(1))
+// buttonsA1 
+// Check if pressed
+    if (buttonsA1.onPress(1))
     {
-        Serial.println("Button 1 is pressed");
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[5, 6]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A1-1 is pressed");
     }
-// Chrck if pressed
-    if (buttonsA7.isPressed(2))
+// Check if pressed
+    if (buttonsA1.onPress(2))
     {
-        Serial.println("Button 2 is pressed");
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[5, 6]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A1-2 is pressed");
     }
-// Chrck if pressed
-    if (buttonsA7.isPressed(3))
+// Check if pressed
+    if (buttonsA1.onPress(3))
     {
-        Serial.println("Button 3 is pressed");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z4dole]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A1-3 is pressed");
     }
-// Chrck if pressed
-    if (buttonsA7.isPressed(4))
+// Check if pressed
+    if (buttonsA1.onPress(4))
     {
-        Serial.println("Button 4 is pressed");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z4hore]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A1-4 is pressed");
     }
-// Chrck if pressed
-    if (buttonsA7.isPressed(5))
+// Check if pressed
+    if (buttonsA1.onPress(5))
     {
-        Serial.println("Button 5 is pressed");
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[11]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A1-5 is pressed");
     }
-// Chrck if pressed
-    if (buttonsA7.isPressed(6))
+// Check if pressed
+    if (buttonsA1.onPress(6))
     {
-        Serial.println("Button 6 is pressed");
-    }
-
-    // Chrck if pressed
-    // if (buttonsA6.isPressed(0))
-    // {
-    //     Serial.println("Button 0 is pressed");
-    // }
-    // Chrck if pressed
-    if (buttonsA6.isPressed(1))
-    {
-        Serial.println("Button buttonsA6 1 is pressed");
-    }
-    // Chrck if pressed
-    if (buttonsA6.isPressed(2))
-    {
-        Serial.println("Button buttonsA6 2 is pressed");
-    }
-    // Chrck if pressed
-    if (buttonsA6.isPressed(3))
-    {
-        Serial.println("Button buttonsA6 3 is pressed");
-    }
-    // Chrck if pressed
-    if (buttonsA6.isPressed(4))
-    {
-        Serial.println("Button buttonsA6 4 is pressed");
-    }
-    // Chrck if pressed
-    if (buttonsA6.isPressed(5))
-    {
-        Serial.println("Button buttonsA6 5 is pressed");
-    }
-    // Chrck if pressed
-    if (buttonsA6.isPressed(6))
-    {
-        Serial.println("Button buttonsA6 6 is pressed");
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[10]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A1-6 is pressed");
     }
 
+// buttonsA2
+// Check if pressed
+    if (buttonsA2.onPress(1))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[2]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A2-1 is pressed");
+    }
+// Check if pressed
+    if (buttonsA2.onPress(2))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[3]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A2-2 is pressed");
+    }
+// Check if pressed
+    if (buttonsA2.onPress(3))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[45]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A2-3 is pressed");
+    }
+// Check if pressed
+    if (buttonsA2.onPress(4))
+    {
+        Serial.println("Button A2-4 is pressed");
+    }
+// Check if pressed
+    if (buttonsA2.onPress(5))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[11]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A2-5 is pressed");
+    }
+// Check if pressed
+    if (buttonsA2.onPress(6))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[7]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A2-6 is pressed");
+    }
 
-    // MQTT connect & reconnect
+// buttonsA4
+// Check if pressed
+    if (buttonsA4.onPress(1))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[2]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A4-1 is pressed");
+    }
+// Check if pressed
+    if (buttonsA4.onPress(2))
+    {
+        Serial.println("Button A4-2 is pressed");
+    }
+// Check if pressed
+    if (buttonsA4.onPress(3))
+    {
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z2dole]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A4-3 is pressed");
+    }
+// Check if pressed
+    if (buttonsA4.onPress(4))
+    {
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z2hore]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A4-4 is pressed");
+    }
+// Check if pressed
+    if (buttonsA4.onPress(5))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[7]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A4-5 is pressed");
+    }
+// Check if pressed
+    if (buttonsA4.onPress(6))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[12]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A4-6 is pressed");
+    }
+
+// buttonsA13
+// Check if pressed
+    if (buttonsA13.onPress(1))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[44]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A13-1 is pressed");
+    }
+// Check if pressed
+    if (buttonsA13.onPress(2))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[43]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A13-2 is pressed");
+    }
+// Check if pressed
+    if (buttonsA13.onPress(3))
+    {
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z1hore]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A13-3 is pressed");
+    }
+// Check if pressed
+    if (buttonsA13.onPress(4))
+    {
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z1dole]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A13-4 is pressed");
+    }
+// Check if pressed
+    if (buttonsA13.onPress(5))
+    {
+        Serial.println("Button A13-5 is pressed");
+    }
+// Check if pressed
+    if (buttonsA13.onPress(6))
+    {
+        client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[11]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A13-6 is pressed");
+    }
+
+// buttonsA14
+// Check if pressed
+    if (buttonsA14.onPress(1))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[12]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A14-1 is pressed");
+    }
+// Check if pressed
+    if (buttonsA14.onPress(2))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[4]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A14-2 is pressed");
+    }
+// Check if pressed
+    if (buttonsA14.onPress(3))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[78]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A14-3 is pressed");
+    }
+// Check if pressed
+    if (buttonsA14.onPress(4))
+    {
+        Serial.println("Button A14-4 is pressed");
+    }
+// Check if pressed
+    if (buttonsA14.onPress(5))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[79]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A14-5 is pressed");
+    }
+// Check if pressed
+    if (buttonsA14.onPress(6))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[80]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A14-6 is pressed");
+    }
+
+// buttonsA15
+// Check if pressed
+    if (buttonsA15.onPress(1))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[9]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A15-1 is pressed");
+    }
+// Check if pressed
+    if (buttonsA15.onPress(2))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[10]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A15-2 is pressed");
+    }
+// Check if pressed
+    if (buttonsA15.onPress(3))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[7]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A15-3 is pressed");
+    }
+// Check if pressed
+    if (buttonsA15.onPress(4))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[12]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A15-4 is pressed");
+    }
+// Check if pressed
+    if (buttonsA15.onPress(5))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[78]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A15-5 is pressed");
+    }
+// Check if pressed
+    if (buttonsA15.onPress(6))
+    {
+        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[79]}");
+        client.subscribe("ACM0");
+        Serial.println("Button A15-6 is pressed");
+    }
+
+ 
+ // MQTT connect & reconnect
     if (!client.connected())
     {
         long now = millis();
