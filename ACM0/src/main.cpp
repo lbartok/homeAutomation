@@ -133,7 +133,6 @@ void onButtonPressedA5(Button &btn)
 {
     client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[2]}");
     client.subscribe("ACM0");
-    Serial.print(btn);
     Serial.println(" button A5 pressed");
 }
 
@@ -142,7 +141,6 @@ void onButtonPressedA6(Button &btn)
 {
     client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[8]}");
     client.subscribe("ACM0");
-    Serial.print(btn);
     Serial.println(" button A6 pressed");
 }
 
@@ -151,7 +149,6 @@ void onButtonPressedA7(Button &btn)
 {
     client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[13]}");
     client.subscribe("ACM0");
-    Serial.print(btn);
     Serial.println(" button A7 pressed");
 }
 
@@ -160,7 +157,6 @@ void onButtonPressedA8(Button &btn)
 {
     client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[42]}");
     client.subscribe("ACM0");
-    Serial.print(btn);
     Serial.println(" button A8 pressed");
 }
 
@@ -169,7 +165,6 @@ void onButtonPressedA9(Button &btn)
 {
     client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[12]}");
     client.subscribe("ACM0");
-    Serial.print(btn);
     Serial.println(" button A9 pressed");
 }
 
