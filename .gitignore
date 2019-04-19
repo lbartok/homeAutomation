@@ -31,3 +31,6 @@
 *.out
 *.app
 ACM1/.vscode/
+ACM0/.vscode/
+acm0.*
+acm1.*
