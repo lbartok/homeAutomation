@@ -41,8 +41,8 @@ void toggle(int pin)
 
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length) {
-    const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 50;
-    DynamicJsonBuffer jsonBuffer(capacity);
+    // const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 50;
+    // DynamicJsonBuffer jsonBuffer(capacity);
 
     // const char *json = "{\"action\":\"toggle\",\"output\":[1,2,3,4,9,9,9,9,9,9]}";
     // JsonObject& root = jsonBuffer.parseObject(json);
@@ -57,9 +57,19 @@ void callback(char *topic, byte *payload, unsigned int length) {
     // }
     // Serial.println();
 
-    JsonObject &root = jsonBuffer.parseObject(payload);
-    if (root.success()){
-        const char* action = root["action"];
+    // JsonObject &root = jsonBuffer.parseObject(payload);
+    // if (root.success()){
+
+    const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 30;
+    DynamicJsonDocument root(capacity);
+
+    // const char* json = "{\"action\":\"toggle\",\"output\":[1,2,3,4,9,9,9,9,9,9]}";
+
+    deserializeJson(root, payload);
+
+    const char* action = root["action"]; // "toggle"
+
+        // const char* action = root["action"];
         Serial.println(action);
 
 
@@ -75,7 +85,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
             }
         }
         Serial.println("-----------------------");
-    }
+    // }
 
     
 
