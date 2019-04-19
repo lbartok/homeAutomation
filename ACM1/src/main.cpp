@@ -92,11 +92,63 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
 
         // Serial.println(strcmp(action, "roletyHore"));
-        if (strcmp(action, "Z3hore")==0)
+        if (strcmp(action, "rolety")==0)
         {
-            digitalWrite(CONTROLLINO_R2, HIGH);
+
+            const char* output = root["output"][0];
+            Serial.println(output);
+            Serial.println(digitalRead(CONTROLLINO_R2));
+
+            // digitalRead(CONTROLLINO_R2)
+        if(digitalRead(CONTROLLINO_R2)==LOW){
+            if( strcmp(output, "Z3dole")==0 ){
+                Serial.println("IdemDole");
+                digitalWrite(CONTROLLINO_R2, HIGH);
+                digitalWrite(CONTROLLINO_R3, HIGH);
+                digitalWrite(CONTROLLINO_R4, HIGH);
+                digitalWrite(CONTROLLINO_R5, HIGH);
+                digitalWrite(CONTROLLINO_R6, HIGH);
+                digitalWrite(CONTROLLINO_R7, HIGH);
+                digitalWrite(CONTROLLINO_R8, HIGH);
+                digitalWrite(CONTROLLINO_R9, HIGH);
+                digitalWrite(CONTROLLINO_R10, HIGH);
+                digitalWrite(CONTROLLINO_R11, HIGH);
+                digitalWrite(CONTROLLINO_R12, HIGH);
+                digitalWrite(CONTROLLINO_R13, HIGH);
+            } 
+            if( strcmp(output, "Z3hore")==0 ){
+                Serial.println("idemHore");
+                digitalWrite(CONTROLLINO_R2, HIGH);
+                digitalWrite(CONTROLLINO_R3, LOW);
+                digitalWrite(CONTROLLINO_R4, HIGH);
+                digitalWrite(CONTROLLINO_R5, LOW);  
+                digitalWrite(CONTROLLINO_R6, HIGH);
+                digitalWrite(CONTROLLINO_R7, LOW);
+                digitalWrite(CONTROLLINO_R8, HIGH);
+                digitalWrite(CONTROLLINO_R9, LOW);
+                digitalWrite(CONTROLLINO_R10, HIGH);
+                digitalWrite(CONTROLLINO_R11, LOW);
+                digitalWrite(CONTROLLINO_R12, HIGH);
+                digitalWrite(CONTROLLINO_R13, LOW);
+            } 
+
+        } else {
+            digitalWrite(CONTROLLINO_R2, LOW);
             digitalWrite(CONTROLLINO_R3, LOW);
-            Serial.println("R Hore");
+            digitalWrite(CONTROLLINO_R4, LOW);
+            digitalWrite(CONTROLLINO_R5, LOW);
+            digitalWrite(CONTROLLINO_R6, LOW);
+            digitalWrite(CONTROLLINO_R7, LOW);
+            digitalWrite(CONTROLLINO_R8, LOW);
+            digitalWrite(CONTROLLINO_R9, LOW);
+            digitalWrite(CONTROLLINO_R10, LOW);
+            digitalWrite(CONTROLLINO_R11, LOW);
+            digitalWrite(CONTROLLINO_R12, LOW);
+            digitalWrite(CONTROLLINO_R13, LOW);
+            Serial.println("idem hocikam-stop");            
+        }
+
+
         }
 
 
