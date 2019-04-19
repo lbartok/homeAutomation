@@ -88,10 +88,20 @@ void callback(char *topic, byte *payload, unsigned int length) {
             }
             Serial.println("-- Executed");
         }
+// {\"action\":\"rolety\",\"output\":[Z3hore]}
 
-        Serial.println(strcmp(action, "roletyHore"));
 
-            if (strcmp(action, "roletyHore")==0)
+        // Serial.println(strcmp(action, "roletyHore"));
+        if (strcmp(action, "Z3hore")==0)
+        {
+            digitalWrite(CONTROLLINO_R2, HIGH);
+            digitalWrite(CONTROLLINO_R3, LOW);
+            Serial.println("R Hore");
+        }
+
+
+
+        if (strcmp(action, "roletyHore")==0)
         {
             digitalWrite(CONTROLLINO_R2, HIGH);
             digitalWrite(CONTROLLINO_R3, LOW);
@@ -107,6 +117,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
             digitalWrite(CONTROLLINO_R13, LOW);
             Serial.println("R Hore");
         }
+
         if (strcmp(action, "roletyDole") ==0)
         {
             digitalWrite(CONTROLLINO_R2, HIGH);

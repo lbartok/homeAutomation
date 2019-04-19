@@ -260,14 +260,14 @@ void loop()
 // Check if pressed
     if (buttonsA0.onPress(3))
     {
-        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z3dole]}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[\"Z3dole\"]}");
         client.subscribe("ACM0");
         Serial.println("Button A0-3 is pressed");
     }
 // Check if pressed
     if (buttonsA0.onPress(4))
     {
-        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z3hore]}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[\"Z3hore\"]}");
         client.subscribe("ACM0");
         Serial.println("Button A0-4 is pressed");
     } 
@@ -304,14 +304,14 @@ void loop()
 // Check if pressed
     if (buttonsA1.onPress(3))
     {
-        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z4dole]}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[\"Z4dole\"]}");
         client.subscribe("ACM0");
         Serial.println("Button A1-3 is pressed");
     }
 // Check if pressed
     if (buttonsA1.onPress(4))
     {
-        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z4hore]}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[\"Z4hore\"]}");
         client.subscribe("ACM0");
         Serial.println("Button A1-4 is pressed");
     }
@@ -390,14 +390,14 @@ void loop()
 // Check if pressed
     if (buttonsA4.onPress(3))
     {
-        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z2dole]}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[\"Z2dole\"]}");
         client.subscribe("ACM0");
         Serial.println("Button A4-3 is pressed");
     }
 // Check if pressed
     if (buttonsA4.onPress(4))
     {
-        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z2hore]}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[\"Z2hore\"]}");
         client.subscribe("ACM0");
         Serial.println("Button A4-4 is pressed");
     }
@@ -434,14 +434,14 @@ void loop()
 // Check if pressed
     if (buttonsA13.onPress(3))
     {
-        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z1hore]}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[\"Z1hore\"]}");
         client.subscribe("ACM0");
         Serial.println("Button A13-3 is pressed");
     }
 // Check if pressed
     if (buttonsA13.onPress(4))
     {
-        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[Z1dole]}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"output\":[\"Z1dole\"]}");
         client.subscribe("ACM0");
         Serial.println("Button A13-4 is pressed");
     }
