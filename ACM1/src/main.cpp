@@ -14,6 +14,8 @@
 #include <PushButton.h>
 #include <Bounce2.h> // https://github.com/thomasfredericks/Bounce-Arduino-Wiring
 
+// timer functionality
+#include <neotimer.h>
 
 
 
@@ -33,6 +35,9 @@ long lastReconnectAttempt = 0;
 
 const int BUTTONS_TOTAL = 7;
 const int BUTTONS_VALUES_1[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
+
+
+Neotimer timerZ3dole = Neotimer(5000); // 1 second timer
 
 void toggle(int pin)
 {
@@ -94,7 +99,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
         // Serial.println(strcmp(action, "roletyHore"));
         if (strcmp(action, "rolety")==0)
         {
-
+            timerZ3dole.start();
             const char* output = root["output"][0];
             Serial.println(output);
             Serial.println(digitalRead(CONTROLLINO_R2));
@@ -480,6 +485,24 @@ void setup()
 
 void loop()
 {
+
+  if(timerZ3dole.done()){
+
+    digitalWrite(CONTROLLINO_R2, LOW);
+    digitalWrite(CONTROLLINO_R3, LOW);
+    digitalWrite(CONTROLLINO_R4, LOW);
+    digitalWrite(CONTROLLINO_R5, LOW);
+    digitalWrite(CONTROLLINO_R6, LOW);
+    digitalWrite(CONTROLLINO_R7, LOW);
+    digitalWrite(CONTROLLINO_R8, LOW);
+    digitalWrite(CONTROLLINO_R9, LOW);
+    digitalWrite(CONTROLLINO_R10, LOW);
+    digitalWrite(CONTROLLINO_R11, LOW);
+    digitalWrite(CONTROLLINO_R12, LOW);
+    digitalWrite(CONTROLLINO_R13, LOW);
+
+    Serial.println("Timer Z3dole finished");
+  }
 
 
     // Analog
