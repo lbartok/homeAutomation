@@ -13,14 +13,9 @@
 #include <ButtonEventCallback.h>
 #include <PushButton.h>
 #include <Bounce2.h> // https://github.com/thomasfredericks/Bounce-Arduino-Wiring
-
 // timer functionality
 #include <neotimer.h>
 
-
-
-// MQTT setup
-// const int BUTTONS_TOTAL = 7;
 
 byte mac[] = {0xDE, 0xED, 0xBB, 0xFE, 0xAF, 0xBB};
 IPAddress ip(192, 168, 1, 80);
@@ -32,12 +27,11 @@ long lastReconnectAttempt = 0;
 
 
 // set how many buttons you have connected
-
 const int BUTTONS_TOTAL = 7;
 const int BUTTONS_VALUES_1[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 
-
-Neotimer timerZ3dole = Neotimer(5000); // 1 second timer
+unsigned int workingTime = 61000;
+Neotimer timerZ3dole = Neotimer(workingTime); // 60 second timer - to finish all the movements
 
 void toggle(int pin)
 {
@@ -46,65 +40,50 @@ void toggle(int pin)
 
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length) {
-    // const size_t capacity = JSON_ARRAY_SIZE(20) + JSON_OBJECT_SIZE(2) + 50;
-    // DynamicJsonBuffer jsonBuffer(capacity);
-
-    // const char *json = "{\"action\":\"toggle\",\"output\":[1,2,3,4,9,9,9,9,9,9]}";
-    // JsonObject& root = jsonBuffer.parseObject(json);
-
-    // handle message arrived
-    // Serial.print("[");
-    // Serial.print(topic);
-    // Serial.print("] ");
-    // for (unsigned int i = 0; i < length; i++)
-    // {
-    //     Serial.print((char)payload[i]);
-    // }
-    // Serial.println();
-
 
     const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 30;
     DynamicJsonDocument root(capacity);
-
-    // const char* json = "{\"action\":\"toggle\",\"output\":[1,2,3,4,9,9,9,9,9,9]}";
-
     deserializeJson(root, payload);
 
     const char* action = root["action"]; // "toggle"
 
-    // JsonObject& root = jsonBuffer.parseObject(payload);
-    // if (root.success()){
-        // const char* action = root["action"];
-        Serial.println(action);
+    Serial.println(action);
 
-        if (strcmp(action, "toggle")==0 )
+    if (strcmp(action, "toggle")==0 )
+    {
+
+        for (unsigned int i = 0; i < root["output"].size(); i++)
         {
-
-            for (unsigned int i = 0; i < root["output"].size(); i++)
+            const int button = root["output"][i];
+            if (button != 0)
             {
-                const int button = root["output"][i];
-                if (button != 0)
-                {
-                    toggle(button);
-                    Serial.print(button);
-                    Serial.print("--");
-                    Serial.println(digitalRead(button));
-                }
+                toggle(button);
+                Serial.print(button);
+                Serial.print("--");
+                Serial.println(digitalRead(button));
             }
-            Serial.println("-- Executed");
         }
-// {\"action\":\"rolety\",\"output\":[Z3hore]}
+        Serial.println("-- Executed");
+    }
 
+    if (strcmp(action, "rolety")==0)
+    {
+        if(root.containsKey("time")){
+            workingTime = root["time"];
+            Serial.print("TimeExist and it is: ");
+            Serial.println(workingTime);
+        } else {
+            workingTime = 61000;
+            Serial.print("TimeExist and it is: ");
+            Serial.println(workingTime);
+        }
 
-        // Serial.println(strcmp(action, "roletyHore"));
-        if (strcmp(action, "rolety")==0)
-        {
-            timerZ3dole.start();
-            const char* output = root["output"][0];
-            Serial.println(output);
-            Serial.println(digitalRead(CONTROLLINO_R2));
+        timerZ3dole = Neotimer(workingTime);
+        timerZ3dole.start();
+        const char* output = root["output"][0];
+        Serial.println(output);
+        Serial.println(digitalRead(CONTROLLINO_R2));
 
-            // digitalRead(CONTROLLINO_R2)
         if(digitalRead(CONTROLLINO_R2)==LOW){
             if( strcmp(output, "Z3dole")==0 ){
                 Serial.println("IdemDole");
@@ -136,7 +115,6 @@ void callback(char *topic, byte *payload, unsigned int length) {
                 digitalWrite(CONTROLLINO_R12, HIGH);
                 digitalWrite(CONTROLLINO_R13, LOW);
             } 
-
         } else {
             digitalWrite(CONTROLLINO_R2, LOW);
             digitalWrite(CONTROLLINO_R3, LOW);
@@ -150,51 +128,43 @@ void callback(char *topic, byte *payload, unsigned int length) {
             digitalWrite(CONTROLLINO_R11, LOW);
             digitalWrite(CONTROLLINO_R12, LOW);
             digitalWrite(CONTROLLINO_R13, LOW);
+            timerZ3dole.reset();
             Serial.println("idem hocikam-stop");            
         }
+    }
 
+    // if (strcmp(action, "roletyHore")==0)
+    // {
+    //     digitalWrite(CONTROLLINO_R2, HIGH);
+    //     digitalWrite(CONTROLLINO_R3, LOW);
+    //     digitalWrite(CONTROLLINO_R4, HIGH);
+    //     digitalWrite(CONTROLLINO_R5, LOW);
+    //     digitalWrite(CONTROLLINO_R6, HIGH);
+    //     digitalWrite(CONTROLLINO_R7, LOW);
+    //     digitalWrite(CONTROLLINO_R8, HIGH);
+    //     digitalWrite(CONTROLLINO_R9, LOW);
+    //     digitalWrite(CONTROLLINO_R10, HIGH);
+    //     digitalWrite(CONTROLLINO_R11, LOW);
+    //     digitalWrite(CONTROLLINO_R12, HIGH);
+    //     digitalWrite(CONTROLLINO_R13, LOW);
+    //     Serial.println("R Hore");
+    // }
 
-        }
-
-
-
-        if (strcmp(action, "roletyHore")==0)
-        {
-            digitalWrite(CONTROLLINO_R2, HIGH);
-            digitalWrite(CONTROLLINO_R3, LOW);
-            digitalWrite(CONTROLLINO_R4, HIGH);
-            digitalWrite(CONTROLLINO_R5, LOW);
-            digitalWrite(CONTROLLINO_R6, HIGH);
-            digitalWrite(CONTROLLINO_R7, LOW);
-            digitalWrite(CONTROLLINO_R8, HIGH);
-            digitalWrite(CONTROLLINO_R9, LOW);
-            digitalWrite(CONTROLLINO_R10, HIGH);
-            digitalWrite(CONTROLLINO_R11, LOW);
-            digitalWrite(CONTROLLINO_R12, HIGH);
-            digitalWrite(CONTROLLINO_R13, LOW);
-            Serial.println("R Hore");
-        }
-
-        if (strcmp(action, "roletyDole") ==0)
-        {
-            digitalWrite(CONTROLLINO_R2, HIGH);
-            digitalWrite(CONTROLLINO_R3, HIGH);
-            digitalWrite(CONTROLLINO_R4, HIGH);
-            digitalWrite(CONTROLLINO_R5, HIGH);
-            digitalWrite(CONTROLLINO_R6, HIGH);
-            digitalWrite(CONTROLLINO_R7, HIGH);
-            digitalWrite(CONTROLLINO_R8, HIGH);
-            digitalWrite(CONTROLLINO_R9, HIGH);
-            digitalWrite(CONTROLLINO_R10, HIGH);
-            digitalWrite(CONTROLLINO_R11, HIGH);
-            digitalWrite(CONTROLLINO_R12, HIGH);
-            digitalWrite(CONTROLLINO_R13, HIGH);
-            Serial.println("R Dole");
-        }
-
-        Serial.println("--------- ----------- Success -----------------------");
-    // } else {
-    //     Serial.println("--------- ----------- FAIL!!! -----------------------");
+    // if (strcmp(action, "roletyDole") ==0)
+    // {
+    //     digitalWrite(CONTROLLINO_R2, HIGH);
+    //     digitalWrite(CONTROLLINO_R3, HIGH);
+    //     digitalWrite(CONTROLLINO_R4, HIGH);
+    //     digitalWrite(CONTROLLINO_R5, HIGH);
+    //     digitalWrite(CONTROLLINO_R6, HIGH);
+    //     digitalWrite(CONTROLLINO_R7, HIGH);
+    //     digitalWrite(CONTROLLINO_R8, HIGH);
+    //     digitalWrite(CONTROLLINO_R9, HIGH);
+    //     digitalWrite(CONTROLLINO_R10, HIGH);
+    //     digitalWrite(CONTROLLINO_R11, HIGH);
+    //     digitalWrite(CONTROLLINO_R12, HIGH);
+    //     digitalWrite(CONTROLLINO_R13, HIGH);
+    //     Serial.println("R Dole");
     // }
 }
 
@@ -485,8 +455,8 @@ void setup()
 
 void loop()
 {
-
-  if(timerZ3dole.done()){
+    // timerZ3dole.reset();
+  if( timerZ3dole.done() && digitalRead(CONTROLLINO_R2)!=LOW ){
 
     digitalWrite(CONTROLLINO_R2, LOW);
     digitalWrite(CONTROLLINO_R3, LOW);
