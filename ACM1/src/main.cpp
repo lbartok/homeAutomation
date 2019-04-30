@@ -20,6 +20,7 @@
 byte mac[] = {0xDE, 0xED, 0xBB, 0xFE, 0xAF, 0xBB};
 IPAddress ip(192, 168, 1, 80);
 IPAddress server(192, 168, 1, 10);
+// IPAddress server(192, 168, 1, 10);
 
 EthernetClient ethClient;
 PubSubClient client(ethClient);
