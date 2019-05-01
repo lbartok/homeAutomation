@@ -34,7 +34,6 @@ long lastReconnectAttempt = 0;
 const int BUTTONS_TOTAL = 7;
 const int BUTTONS_VALUES_1[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 
-// we might need to write advanced toggle or a check before toggle for multitoggle
 void toggle(int pin)
 {
     digitalWrite(pin, !digitalRead(pin));
