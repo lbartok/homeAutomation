@@ -1,0 +1,8 @@
+raspbian
+ - MQTT mosquito
+ - add user - laci & andy
+ - platformio
+ - docker
+ - OpenVPN
+
+ 
