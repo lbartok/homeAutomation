@@ -18,8 +18,9 @@
 
 
 byte mac[] = {0xDE, 0xED, 0xBB, 0xFE, 0xAF, 0xBB};
-IPAddress ip(192, 168, 1, 80);
-IPAddress server(192, 168, 1, 10);
+IPAddress ip(192, 168, 69, 180);
+IPAddress server(192, 168, 69, 10);
+// IPAddress server(192, 168, 1, 10);
 
 EthernetClient ethClient;
 PubSubClient client(ethClient);
@@ -29,6 +30,7 @@ long lastReconnectAttempt = 0;
 // set how many buttons you have connected
 const int BUTTONS_TOTAL = 7;
 const int BUTTONS_VALUES_1[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
+const int BUTTONS_VALUES_2[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 
 unsigned int workingTime = 61000;
 Neotimer timerZ3dole = Neotimer(workingTime); // 60 second timer - to finish all the movements
