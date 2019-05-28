@@ -32,8 +32,15 @@ const int BUTTONS_TOTAL = 7;
 const int BUTTONS_VALUES_1[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 const int BUTTONS_VALUES_2[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 
-unsigned int workingTime = 61000;
+unsigned int workingTime = 68000;
+/*
 Neotimer timerZ3dole = Neotimer(workingTime); // 60 second timer - to finish all the movements
+*/
+// set how many blinds there are on the house and initialize array
+const int BLINDS_TOTAL = 6;
+Neotimer roletyTimer[BLINDS_TOTAL];
+// set blinds controll pin
+const int BLINDS[BLINDS_TOTAL] = {CONTROLLINO_R2,CONTROLLINO_R4,CONTROLLINO_R6,CONTROLLINO_R8,CONTROLLINO_R10,CONTROLLINO_R12};
 
 void toggle(int pin)
 {
@@ -47,13 +54,10 @@ void callback(char *topic, byte *payload, unsigned int length) {
     DynamicJsonDocument root(capacity);
     deserializeJson(root, payload);
 
-    const char* action = root["action"]; // "toggle"
+    const char* action = root["action"];
 
-    Serial.println(action);
-
-    if (strcmp(action, "toggle")==0 )
+    if (strcmp(action, "toggle") == 0)
     {
-
         for (unsigned int i = 0; i < root["output"].size(); i++)
         {
             const int button = root["output"][i];
@@ -68,106 +72,58 @@ void callback(char *topic, byte *payload, unsigned int length) {
         Serial.println("-- Executed");
     }
 
-    if (strcmp(action, "rolety")==0)
+    if (strcmp(action, "rolety") == 0)
     {
+        // check for existence of 'time' parameter in JSON
         if(root.containsKey("time")){
             workingTime = root["time"];
             Serial.print("TimeExist and it is: ");
             Serial.println(workingTime);
         } else {
-            workingTime = 61000;
-            Serial.print("TimeExist and it is: ");
+            workingTime = 68000;
+            Serial.print("TimeNotExist and it is: ");
             Serial.println(workingTime);
         }
 
-        timerZ3dole = Neotimer(workingTime);
-        timerZ3dole.start();
-        const char* output = root["output"][0];
-        Serial.println(output);
-        Serial.println(digitalRead(CONTROLLINO_R2));
+        // direction would either be "up" or "down"
+        const char* direction = root["direction"];
+        // initialize PinStatus values
+        bool controllPinStatus = LOW;
+        bool directionPinStatus = LOW;
+        // set timer for each blind that needs to be moved
+        // output should be all the blinds that needs to be moved
+        for (unsigned int y = 0; y < root["output"].size(); y++)
+        {
+            int blind = root["output"][y];
+            roletyTimer[blind] = Neotimer(workingTime);
+            roletyTimer[blind].start();
+            unsigned int controllPin = BLINDS[blind];
+            unsigned int directionPin = controllPin + 1;
 
-        if(digitalRead(CONTROLLINO_R2)==LOW){
-            if( strcmp(output, "Z3dole")==0 ){
-                Serial.println("IdemDole");
-                digitalWrite(CONTROLLINO_R2, HIGH);
-                digitalWrite(CONTROLLINO_R3, HIGH);
-                digitalWrite(CONTROLLINO_R4, HIGH);
-                digitalWrite(CONTROLLINO_R5, HIGH);
-                digitalWrite(CONTROLLINO_R6, HIGH);
-                digitalWrite(CONTROLLINO_R7, HIGH);
-                digitalWrite(CONTROLLINO_R8, HIGH);
-                digitalWrite(CONTROLLINO_R9, HIGH);
-                digitalWrite(CONTROLLINO_R10, HIGH);
-                digitalWrite(CONTROLLINO_R11, HIGH);
-                digitalWrite(CONTROLLINO_R12, HIGH);
-                digitalWrite(CONTROLLINO_R13, HIGH);
-            } 
-            if( strcmp(output, "Z3hore")==0 ){
-                Serial.println("idemHore");
-                digitalWrite(CONTROLLINO_R2, HIGH);
-                digitalWrite(CONTROLLINO_R3, LOW);
-                digitalWrite(CONTROLLINO_R4, HIGH);
-                digitalWrite(CONTROLLINO_R5, LOW);  
-                digitalWrite(CONTROLLINO_R6, HIGH);
-                digitalWrite(CONTROLLINO_R7, LOW);
-                digitalWrite(CONTROLLINO_R8, HIGH);
-                digitalWrite(CONTROLLINO_R9, LOW);
-                digitalWrite(CONTROLLINO_R10, HIGH);
-                digitalWrite(CONTROLLINO_R11, LOW);
-                digitalWrite(CONTROLLINO_R12, HIGH);
-                digitalWrite(CONTROLLINO_R13, LOW);
-            } 
-        } else {
-            digitalWrite(CONTROLLINO_R2, LOW);
-            digitalWrite(CONTROLLINO_R3, LOW);
-            digitalWrite(CONTROLLINO_R4, LOW);
-            digitalWrite(CONTROLLINO_R5, LOW);
-            digitalWrite(CONTROLLINO_R6, LOW);
-            digitalWrite(CONTROLLINO_R7, LOW);
-            digitalWrite(CONTROLLINO_R8, LOW);
-            digitalWrite(CONTROLLINO_R9, LOW);
-            digitalWrite(CONTROLLINO_R10, LOW);
-            digitalWrite(CONTROLLINO_R11, LOW);
-            digitalWrite(CONTROLLINO_R12, LOW);
-            digitalWrite(CONTROLLINO_R13, LOW);
-            timerZ3dole.reset();
-            Serial.println("idem hocikam-stop");            
+            // check if the blind is off
+            if (digitalRead(controllPin) == LOW)
+            {
+                // check desired direction and set the PIN correctly
+                if (strcmp(direction, "up") == 0) 
+                {
+                    directionPinStatus = LOW;
+                } else {
+                    directionPinStatus = HIGH;                    
+                }
+                // set the controll PIN status to HIGH
+                controllPinStatus = HIGH;
+            } else {
+                // clear the PINs and turn the blind off
+                directionPinStatus = LOW;
+                controllPinStatus = LOW;
+                roletyTimer[blind].reset();
+            }
+
+            // set the controllino outputs with the correct status
+            digitalWrite(directionPin, directionPinStatus);
+            digitalWrite(controllPin, controllPinStatus);
         }
     }
-
-    // if (strcmp(action, "roletyHore")==0)
-    // {
-    //     digitalWrite(CONTROLLINO_R2, HIGH);
-    //     digitalWrite(CONTROLLINO_R3, LOW);
-    //     digitalWrite(CONTROLLINO_R4, HIGH);
-    //     digitalWrite(CONTROLLINO_R5, LOW);
-    //     digitalWrite(CONTROLLINO_R6, HIGH);
-    //     digitalWrite(CONTROLLINO_R7, LOW);
-    //     digitalWrite(CONTROLLINO_R8, HIGH);
-    //     digitalWrite(CONTROLLINO_R9, LOW);
-    //     digitalWrite(CONTROLLINO_R10, HIGH);
-    //     digitalWrite(CONTROLLINO_R11, LOW);
-    //     digitalWrite(CONTROLLINO_R12, HIGH);
-    //     digitalWrite(CONTROLLINO_R13, LOW);
-    //     Serial.println("R Hore");
-    // }
-
-    // if (strcmp(action, "roletyDole") ==0)
-    // {
-    //     digitalWrite(CONTROLLINO_R2, HIGH);
-    //     digitalWrite(CONTROLLINO_R3, HIGH);
-    //     digitalWrite(CONTROLLINO_R4, HIGH);
-    //     digitalWrite(CONTROLLINO_R5, HIGH);
-    //     digitalWrite(CONTROLLINO_R6, HIGH);
-    //     digitalWrite(CONTROLLINO_R7, HIGH);
-    //     digitalWrite(CONTROLLINO_R8, HIGH);
-    //     digitalWrite(CONTROLLINO_R9, HIGH);
-    //     digitalWrite(CONTROLLINO_R10, HIGH);
-    //     digitalWrite(CONTROLLINO_R11, HIGH);
-    //     digitalWrite(CONTROLLINO_R12, HIGH);
-    //     digitalWrite(CONTROLLINO_R13, HIGH);
-    //     Serial.println("R Dole");
-    // }
 }
 
 boolean reconnect() {
@@ -246,7 +202,7 @@ void onButtonPressedA13(Button &btn)
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
 void onButtonPressedA14(Button &btn)
 {
-    client.publish("ACM1", "{\"action\":\"roletyHore\"}");
+    client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[0, 1, 2, 3, 4, 5]}");
     client.subscribe("ACM1");
     // Serial.print(btn);
     Serial.println(" button A14 pressed");
@@ -273,7 +229,7 @@ void onButtonPressedI16(Button &btn)
 // btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
 void onButtonPressedI17(Button &btn)
 {
-    client.publish("ACM1", "{\"action\":\"roletyDole\"}");
+    client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[0, 1, 2, 3, 4, 5]}");
     client.subscribe("ACM1");
     // Serial.print(btn);
     Serial.println(" button I17 pressed");
@@ -342,52 +298,6 @@ void onButtonPressedA5(Button &btn)
     Serial.println(" button A5 pressed");
 }
 
-// btn is a reference to the button that fired the event. That means you can use the same event handler for many buttons
-// void onButtonPressedA6(Button &btn)
-// {
-//     // Check if pressed
-//     if (btn == 1)
-//     {
-//         client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[9]}");
-//         client.subscribe("ACM1");
-//         Serial.println("Button buttonsA6 1 is pressed");
-//     }
-//     // Check if pressed
-//     if (btn == 2)
-//     {
-//         client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[10]}");
-//         client.subscribe("ACM1");
-//         Serial.println("Button buttonsA6 2 is pressed");
-//     }
-//     // Check if pressed
-//     if (btn == 3)
-//     {
-//         client.publish("ACM1", "{\"action\":\"rolety\",\"command\":\"Z6_dole\"}");
-//         client.subscribe("ACM1");
-//         Serial.println("Button buttonsA6 3 is pressed");
-//     }
-//     // Check if pressed
-//     if (btn == 4)
-//     {
-//         client.publish("ACM1", "{\"action\":\"rolety\",\"command\":\"Z6_hore\"}");
-//         client.subscribe("ACM1");
-//         Serial.println("Button buttonsA6 4 is pressed");
-//     }
-//     // Check if pressed
-//     if (btn == 5)
-//     {
-//         client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[12]}");
-//         client.subscribe("ACM1");
-//         Serial.println("Button buttonsA6 5 is pressed");
-//     }
-//     // Check if pressed
-//     if (btn == 6)
-//     {
-//         client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[7]}");
-//         client.subscribe("ACM1");
-//         Serial.println("Button buttonsA6 6 is pressed");
-//     }
-// }
 
 void setup()
 {
@@ -457,25 +367,15 @@ void setup()
 
 void loop()
 {
-    // timerZ3dole.reset();
-  if( timerZ3dole.done() && digitalRead(CONTROLLINO_R2)!=LOW ){
-
-    digitalWrite(CONTROLLINO_R2, LOW);
-    digitalWrite(CONTROLLINO_R3, LOW);
-    digitalWrite(CONTROLLINO_R4, LOW);
-    digitalWrite(CONTROLLINO_R5, LOW);
-    digitalWrite(CONTROLLINO_R6, LOW);
-    digitalWrite(CONTROLLINO_R7, LOW);
-    digitalWrite(CONTROLLINO_R8, LOW);
-    digitalWrite(CONTROLLINO_R9, LOW);
-    digitalWrite(CONTROLLINO_R10, LOW);
-    digitalWrite(CONTROLLINO_R11, LOW);
-    digitalWrite(CONTROLLINO_R12, LOW);
-    digitalWrite(CONTROLLINO_R13, LOW);
-
-    Serial.println("Timer Z3dole finished");
+  // check if the timer has finished and turn appropriate PIN status to LOW
+  for (unsigned int b = 0;b < BLINDS_TOTAL;b++)
+  {
+      if (roletyTimer[b].done() && digitalRead(BLINDS[b]) != LOW) 
+      {
+          digitalWrite(BLINDS[b], LOW);
+          digitalWrite(BLINDS[b + 1], LOW);
+      }
   }
-
 
     // Analog
     buttonsA6.update();
@@ -535,17 +435,17 @@ void loop()
     {
         // R2, R3 | R4 , R5 | R6, R7 | R8, R9 | R10, R11 | R12, R13
         // client.publish("ACM1", "{\"action\":\"toggle\",\"output\":[24,25,26,27,28,29,30,31,32,33,34,35]}");
-        client.publish("ACM1", "{\"action\":\"roletyDole\"}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[4, 5]}");
         client.subscribe("ACM1");
-        Serial.println("Button 3 is pressed Roleta Dole");
+        Serial.println("Button 3 is pressed Roleta hore");
     }
 // Check if pressed
     if (buttonsA7.onPress(4))
     {
-        client.publish("ACM1", "{\"action\":\"roletyHore\"}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[4, 5]}");
         client.subscribe("ACM1");
         
-        Serial.println("Button 4 is pressed  Roleta hore");
+        Serial.println("Button 4 is pressed  Roleta dole");
     }
 // Check if pressed
     if (buttonsA7.onPress(5))
@@ -586,7 +486,7 @@ void loop()
     if (buttonsA6.onPress(3))
     {
         // client.publish("ACM1", "{\"action\":\"rolety\",\"command\":\"Z6_dole\"}");
-        client.publish("ACM1", "{\"action\":\"roletyHore\"}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[4, 5]}");
         client.subscribe("ACM1");
         Serial.println("Button buttonsA6 3 is pressed");
     }
@@ -594,7 +494,7 @@ void loop()
     if (buttonsA6.onPress(4))
     {
         // client.publish("ACM1", "{\"action\":\"rolety\",\"command\":\"Z6_hore\"}");
-        client.publish("ACM1", "{\"action\":\"roletyDole\"}");
+        client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[4, 5]}");
         client.subscribe("ACM1");
         Serial.println("Button buttonsA6 4 is pressed");
     }
