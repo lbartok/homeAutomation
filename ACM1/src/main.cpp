@@ -84,6 +84,23 @@ void callback(char *topic, byte *payload, unsigned int length) {
             workingTime = 65535;
             Serial.print("TimeNotExist and it is: ");
             Serial.println(workingTime);
+
+            // check for existence of 'percnt' parameter in JSON
+            if(root.containsKey("percnt")){
+                long percent = root["percnt"];
+                if (percent <= 1) {
+                    workingTime *= percent;
+                } else {
+                    workingTime *= (percent / 100);
+                }
+                Serial.print("PercntExist and it is translated to: ");
+                Serial.print(percent);
+                Serial.print(" / ");
+                Serial.println(workingTime);
+            } else {
+                Serial.print("PercntNotExist therefor it is: ");
+                Serial.println(workingTime);
+            }
         }
 
         // direction would either be "up" or "down"
@@ -187,6 +204,90 @@ boolean reconnect() {
 // make an AnalogMultiButton object, pass in the pin, total and values array
 AnalogMultiButton buttonsA6(CONTROLLINO_A6, BUTTONS_TOTAL, BUTTONS_VALUES_1);
 AnalogMultiButton buttonsA7(CONTROLLINO_A7, BUTTONS_TOTAL, BUTTONS_VALUES_1);
+// these cannot be defined within array, hence array of their pointers
+AnalogMultiButton * ANALOG_BUTTONS_DEF[] = {
+    &buttonsA6, &buttonsA7
+};
+const int ANALOG_BUTTONS_TOTAL = 2;
+// analog buttons actor array (needs to be same order as ANALOG_BUTTONS_DEF)
+const char* ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
+    { //section for topic to which we post MQTT message
+        { //A6
+            "",     //Button 0
+            "ACM0", //Button 1
+            "ACM0", //Button 2
+            "ACM1", //Button 3
+            "ACM1", //Button 4
+            "ACM0", //Button 5
+            "ACM0"  //Button 6
+        },{ //A7
+            "",     //Button 0
+            "ACM0", //Button 1
+            "ACM0", //Button 2
+            "ACM1", //Button 3
+            "ACM1", //Button 4
+            "ACM0", //Button 5
+            "ACM0"  //Button 6
+        }
+    },
+    { //section for actual message to post in MQTT 
+        { //A6
+            "",                                             //Button 0
+            "{\"action\":\"toggle\",\"output\":[9]}",       //Button 1
+            "{\"action\":\"toggle\",\"output\":[10]}",      //Button 2
+            "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[4, 5]}", //Button 3
+            "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[4, 5]}",   //Button 4
+            "{\"action\":\"toggle\",\"output\":[12]}",      //Button 5
+            "{\"action\":\"toggle\",\"output\":[7]}"        //Button 6
+        },{ //A7
+            "",                                             //Button 0
+            "{\"action\":\"toggle\",\"output\":[13, 44]}",  //Button 1
+            "{\"action\":\"toggle\",\"output\":[12]}",      //Button 2
+            "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[4, 5]}", //Button 3
+            "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[4, 5]}",   //Button 4
+            "{\"action\":\"toggle\",\"output\":[80]}",      //Button 5
+            "{\"action\":\"toggle\",\"output\":[8, 9]}"     //Button 6
+        }
+    }
+};
+//IT SEARCHES FOR POSSITION IN ARRAY BASED ON PROVIDED KEY.
+//DEFINITION REQUIRES ARRAY NAME AND POINTER, AMOUNT OF VALUES IN THE ROW, SEARCHING KEY
+int findAMBElement(AnalogMultiButton* array[], int lastElement, AnalogMultiButton* searchKey) { 
+  int index = -1;
+  for(int fE = 0; fE < lastElement; fE++) {
+    if(array[fE] == searchKey) { 
+        index = fE;
+    }
+  }
+  return index;
+}
+
+void checkAnalogButtonsPress(AnalogMultiButton * buttonsObject) {
+    // find pressed analog button object
+    int pressedButtonsObject = findAMBElement(ANALOG_BUTTONS_DEF, ANALOG_BUTTONS_TOTAL, buttonsObject);
+    AnalogMultiButton deRefObject = *buttonsObject;
+    // cycle through all possible buttons
+    for (unsigned int aB = 0; aB < BUTTONS_TOTAL; aB++) {
+        if (deRefObject.onPress(aB)) {
+            client.publish(ANALOG_BUTTONS_ACT[0][pressedButtonsObject][aB], ANALOG_BUTTONS_ACT[1][pressedButtonsObject][aB]);
+            client.subscribe("ACM1");
+
+            Serial.println("Button #");
+            Serial.print(aB);
+            Serial.print(" (aB) from switch array #");
+            Serial.print(pressedButtonsObject);
+            Serial.println(" has been pressed!");
+            Serial.println("----");
+            Serial.print("Publish topic: ");
+            Serial.println(ANALOG_BUTTONS_ACT[0][pressedButtonsObject][aB]);
+            Serial.print("Publish payload: ");
+            Serial.println(ANALOG_BUTTONS_ACT[1][pressedButtonsObject][aB]);
+            Serial.println("----");
+            
+        }
+    }
+}
+
 // push buttons definition array
 const int PUSH_BUTTONS_TOTAL = 14;
 PushButton PUSH_BUTTONS_DEF[PUSH_BUTTONS_TOTAL] = {
@@ -298,18 +399,11 @@ void setup()
         PUSH_BUTTONS_DEF[p2].onPress(checkPressedButton);
     }
     
-    pinMode(CONTROLLINO_R2, OUTPUT);
-    pinMode(CONTROLLINO_R3, OUTPUT);
-    pinMode(CONTROLLINO_R4, OUTPUT);
-    pinMode(CONTROLLINO_R5, OUTPUT);
-    pinMode(CONTROLLINO_R6, OUTPUT);
-    pinMode(CONTROLLINO_R7, OUTPUT);
-    pinMode(CONTROLLINO_R8, OUTPUT);
-    pinMode(CONTROLLINO_R9, OUTPUT);
-    pinMode(CONTROLLINO_R10, OUTPUT);
-    pinMode(CONTROLLINO_R11, OUTPUT);
-    pinMode(CONTROLLINO_R12, OUTPUT);
-    pinMode(CONTROLLINO_R13, OUTPUT);
+    // initialize pinMode for blinds
+    for (unsigned int pM = 0; pM < BLINDS_TOTAL; pM++) {
+        pinMode(BLINDS[pM], OUTPUT);
+        pinMode(BLINDS[pM] + 1, OUTPUT);
+    }
 }
 
 
@@ -317,26 +411,34 @@ void loop()
 {
     // rolety / blinds
     // check if the timer has finished and turn appropriate PIN status to LOW
-    for (unsigned int b = 0;b < BLINDS_TOTAL;b++)
+    for (unsigned int b = 0;b < BLINDS_TOTAL; b++)
     {
         if (roletyTimer[b].done() && digitalRead(BLINDS[b]) != LOW) 
         {
             digitalWrite(BLINDS[b], LOW);
-            digitalWrite(BLINDS[b + 1], LOW);
+            digitalWrite(BLINDS[b] + 1, LOW);
         }
     }
-
-    // Analog
-    buttonsA6.update();
-    buttonsA7.update(); 
 
     // Digital
     for (unsigned int p3 = 0; p3 < PUSH_BUTTONS_TOTAL; p3++)
     {
         PUSH_BUTTONS_DEF[p3].update();
     }
+    
+    // Analog
+    for (unsigned int aB2 = 0; aB2 < ANALOG_BUTTONS_TOTAL; aB2++)
+    {
+        AnalogMultiButton AMBobject = *ANALOG_BUTTONS_DEF[aB2];
+        AMBobject.update();
+    }
+    // Check if button is pressed
+    for (unsigned int aB3 = 0; aB3 < ANALOG_BUTTONS_TOTAL; aB3++)
+    {
+        checkAnalogButtonsPress(ANALOG_BUTTONS_DEF[aB3]);
+    }
 
-
+/*
     // Check if pressed
     // if (buttonsA7.onPress(0))
     // {
@@ -387,8 +489,8 @@ void loop()
         client.subscribe("ACM1");
         Serial.println("Button 6 is pressed");
     }
-
- /* Move this section up to where the button pressed is defined through function encapsulation */
+*/
+/* Move this section up to where the button pressed is defined through function encapsulation
     // Check if pressed
     // if (buttonsA6.onPress(0))
     // {
@@ -438,7 +540,7 @@ void loop()
         client.subscribe("ACM1");
         Serial.println("Button buttonsA6 6 is pressed");
     }
-/* */
+*/
 
     // MQTT connect & reconnect
     if (!client.connected())
@@ -457,7 +559,6 @@ void loop()
     else
     {
         // Client connected
-
         client.loop();
     }
 }
