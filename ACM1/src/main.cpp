@@ -33,11 +33,19 @@ const int BUTTONS_VALUES_1[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 const int BUTTONS_VALUES_2[BUTTONS_TOTAL] = {0, 14, 136, 252, 399, 551, 673};
 
 // Blinds variables
-// set workingTime variable to max time needed to get blinds all the way
-long workingTime = 65535; // max value for unsigned int = 65535
-// set how many blinds there are on the house and initialize array
+const char* direction = "up";
+long percent = -1;
+long workingTimePercent;
+bool tiltBlind = 0;
+// set maxTime variable to max time needed to get blinds all the way
+long maxTime = 65535; // max time used for calculating working time
+long workingTime = maxTime;
+// set how many blinds there are on the house and initialize Neotimer and symbol array
 const int BLINDS_TOTAL = 6;
 Neotimer roletyTimer[BLINDS_TOTAL];
+int symbol[BLINDS_TOTAL];
+// blinds timer storage where 0 is all the way UP and 100 all the way DOWN
+long blindsTimerStorage[2][BLINDS_TOTAL];
 // set blinds' controll pin array
 const int BLINDS[BLINDS_TOTAL] = {
     CONTROLLINO_R2, CONTROLLINO_R4, CONTROLLINO_R6, CONTROLLINO_R8,
@@ -75,56 +83,78 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
     if (strcmp(action, "rolety") == 0)
     {
-        // check for existence of 'time' parameter in JSON
-        if(root.containsKey("time")){
-            workingTime = root["time"];
-            Serial.print("TimeExist and it is: ");
-            Serial.println(workingTime);
+        // check for existence of 'percnt' parameter in JSON
+        if(root.containsKey("percnt")){
+            percent = root["percnt"];
+            Serial.print("PercntExist and it is translated to: ");
+            Serial.print(percent);
         } else {
-            workingTime = 65535;
-            Serial.print("TimeNotExist and it is: ");
-            Serial.println(workingTime);
-
-            // check for existence of 'percnt' parameter in JSON
-            if(root.containsKey("percnt")){
-                long percent = root["percnt"];
-                if (percent <= 1) {
-                    workingTime *= percent;
-                } else {
-                    workingTime *= (percent / 100);
-                }
-                Serial.print("PercntExist and it is translated to: ");
-                Serial.print(percent);
-                Serial.print(" / ");
+            // legacy check - can be removed as it should not be used anymore
+            // check for existence of 'time' parameter in JSON
+            if(root.containsKey("time")){
+                workingTime = root["time"];
+                Serial.print("TimeExist and it is: ");
                 Serial.println(workingTime);
             } else {
-                Serial.print("PercntNotExist therefor it is: ");
+                workingTime = maxTime;
+                Serial.print("TimeNotExist and it is: ");
                 Serial.println(workingTime);
             }
+            // re-instantiate percent to -1 for the program to know it is not used
+            percent = -1;
         }
 
         // direction would either be "up" or "down"
-        const char* direction = root["direction"];
+        // for manual button purposes
+        if (root.containsKey("direction")) {
+            direction = root["direction"];
+        }
         // initialize PinStatus values
         bool controllPinStatus = LOW;
         bool directionPinStatus = LOW;
-        // set timer for each blind that needs to be moved
+
         // output should be all the blinds that needs to be moved [0,1,2,3,4,5]
         for (unsigned int y = 0; y < root["output"].size(); y++)
         {
             int blind = root["output"][y];
-            // set the timer for the current blind and start it
-            roletyTimer[blind] = Neotimer(workingTime);
-            roletyTimer[blind].start();
             // set controll and direction pin - this can be modified if we expand the array
             unsigned int controllPin = BLINDS[blind];
             unsigned int directionPin = controllPin + 1;
+
+            // set the timer for the current blind and start it
+            if (percent >= 0) {
+                workingTimePercent = percent - blindsTimerStorage[0][blind];
+                if (workingTimePercent > 0) {
+                    // blinds need to go down
+                    direction = "down";
+                    symbol[blind] = 1;
+                    // tilt blind so they stay open and visible through
+                    if (percent < 100) {
+                        tiltBlind = 1;
+                    } else {
+                        tiltBlind = 0;
+                    }
+                } else if (workingTimePercent < 0) {
+                    // blinds need to go up
+                    direction = "up";
+                    symbol[blind] = -1;
+                } else {
+                    // prevention of error during division
+                    workingTimePercent = 1;
+                    symbol[blind] = 0;
+                }
+                workingTime = symbol[blind] * (workingTimePercent / 100) * maxTime;
+                blindsTimerStorage[0][blind] = percent;
+                blindsTimerStorage[1][blind] += (workingTime * symbol[blind]);
+            }
+            roletyTimer[blind] = Neotimer(workingTime);
+            roletyTimer[blind].start();
 
             // check if the blind is off
             if (digitalRead(controllPin) == LOW)
             {
                 // check desired direction and set the PIN correctly
-                if (strcmp(direction, "up") == 0 || strcmp(direction, "hore") == 0) 
+                if (strcmp(direction, "up") == 0) 
                 {
                     directionPinStatus = LOW;
                 } else {
@@ -136,11 +166,17 @@ void callback(char *topic, byte *payload, unsigned int length) {
                 // clear the PINs and turn the blind off
                 directionPinStatus = LOW;
                 controllPinStatus = LOW;
+                blindsTimerStorage[1][blind] -= blindsTimerStorage[1][blind] - (symbol[blind] * roletyTimer[blind].stop()); // amount of milis blinds ran
+                blindsTimerStorage[0][blind] = (blindsTimerStorage[1][blind] / maxTime) * 100;
                 roletyTimer[blind].reset();
                 // for serial troubleshooting purposes only
                 Serial.print("Blind #");
                 Serial.print(blind);
-                Serial.println(" stopped as timer is reset.");
+                Serial.print(" stopped at ");
+                Serial.print(blindsTimerStorage[1][blind]);
+                Serial.println("ms / ");
+                Serial.print(blindsTimerStorage[0][blind]);
+                Serial.println("% and timer is reset.");
             }
 
             // set the controllino outputs with the correct status
@@ -163,9 +199,9 @@ void callback(char *topic, byte *payload, unsigned int length) {
         // pin is PIN number based on the controllino.h scheme for (analog-)inputs
         const int MQTTpin = root["pin"];
 
-        if (dir == 1)
+        if (dir >= 1)
         {
-            analogWrite(MQTTpin, 200); //max analogWrite is 255
+            analogWrite(MQTTpin, 140); //max analogWrite is 255
         } else {
             digitalWrite(MQTTpin, LOW);
         }
@@ -250,43 +286,6 @@ const char* ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
         }
     }
 };
-//IT SEARCHES FOR POSSITION IN ARRAY BASED ON PROVIDED KEY.
-//DEFINITION REQUIRES ARRAY NAME AND POINTER, AMOUNT OF VALUES IN THE ROW, SEARCHING KEY
-int findAMBElement(AnalogMultiButton* array[], int lastElement, AnalogMultiButton* searchKey) { 
-  int index = -1;
-  for(int fE = 0; fE < lastElement; fE++) {
-    if(array[fE] == searchKey) { 
-        index = fE;
-    }
-  }
-  return index;
-}
-
-void checkAnalogButtonsPress(AnalogMultiButton * buttonsObject) {
-    // find pressed analog button object
-    int pressedButtonsObject = findAMBElement(ANALOG_BUTTONS_DEF, ANALOG_BUTTONS_TOTAL, buttonsObject);
-    AnalogMultiButton deRefObject = *buttonsObject;
-    // cycle through all possible buttons
-    for (unsigned int aB = 0; aB < BUTTONS_TOTAL; aB++) {
-        if (deRefObject.onPress(aB)) {
-            client.publish(ANALOG_BUTTONS_ACT[0][pressedButtonsObject][aB], ANALOG_BUTTONS_ACT[1][pressedButtonsObject][aB]);
-            client.subscribe("ACM1");
-
-            Serial.println("Button #");
-            Serial.print(aB);
-            Serial.print(" (aB) from switch array #");
-            Serial.print(pressedButtonsObject);
-            Serial.println(" has been pressed!");
-            Serial.println("----");
-            Serial.print("Publish topic: ");
-            Serial.println(ANALOG_BUTTONS_ACT[0][pressedButtonsObject][aB]);
-            Serial.print("Publish payload: ");
-            Serial.println(ANALOG_BUTTONS_ACT[1][pressedButtonsObject][aB]);
-            Serial.println("----");
-            
-        }
-    }
-}
 
 // push buttons definition array
 const int PUSH_BUTTONS_TOTAL = 14;
@@ -417,6 +416,16 @@ void loop()
         {
             digitalWrite(BLINDS[b], LOW);
             digitalWrite(BLINDS[b] + 1, LOW);
+            if (tiltBlind) {
+                const char* publishBlindMessage = "";
+                publishBlindMessage = strcat(b, "{\"action\":\"rolety\",\"direction\":\"up\",\"time\":1000,\"output\":[");
+                publishBlindMessage = strcat("]}", publishBlindMessage);
+                Serial.println("Tilting blind with:");
+                Serial.println(publishBlindMessage);
+                client.publish("ACM1", publishBlindMessage);
+                client.subscribe("ACM1");
+                tiltBlind = 0;
+            }
         }
     }
 
@@ -427,120 +436,22 @@ void loop()
     }
     
     // Analog
-    for (unsigned int aB2 = 0; aB2 < ANALOG_BUTTONS_TOTAL; aB2++)
+    buttonsA6.update();
+    buttonsA7.update();
+    
+    // Check if analog button is pressed
+    for (int aB2 = 0; aB2 < ANALOG_BUTTONS_TOTAL; aB2++)
     {
         AnalogMultiButton AMBobject = *ANALOG_BUTTONS_DEF[aB2];
-        AMBobject.update();
-    }
-    // Check if button is pressed
-    for (unsigned int aB3 = 0; aB3 < ANALOG_BUTTONS_TOTAL; aB3++)
-    {
-        checkAnalogButtonsPress(ANALOG_BUTTONS_DEF[aB3]);
+        // cycle through all possible buttons
+        for (int aB = 0; aB < BUTTONS_TOTAL; aB++) {
+            if (AMBobject.onPress(aB)) {
+                client.publish(ANALOG_BUTTONS_ACT[0][aB2][aB], ANALOG_BUTTONS_ACT[1][aB2][aB]);
+                client.subscribe("ACM1");
+            }
+        }
     }
 
-/*
-    // Check if pressed
-    // if (buttonsA7.onPress(0))
-    // {
-    //     Serial.println("Button 0 is pressed");
-    // }
-    // Check if pressed
-    if (buttonsA7.onPress(1))
-    {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[13, 44]}");
-        client.subscribe("ACM1");
-        Serial.println("Button 1 is pressed");
-    }
-    // Check if pressed
-    if (buttonsA7.onPress(2))
-    {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[12]}");
-        client.subscribe("ACM1");
-        Serial.println("Button 2 is pressed");
-    }
-    // Check if pressed
-    if (buttonsA7.onPress(3))
-    {
-        // client.publish("ACM1", "{\"action\":\"rolety\",\"command\":\"Z5_dole\"}");
-        client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[4, 5]}");
-        client.subscribe("ACM1");
-        Serial.println("Button 3 is pressed Roleta dole");
-    }
-    // Check if pressed
-    if (buttonsA7.onPress(4))
-    {
-        // client.publish("ACM1", "{\"action\":\"rolety\",\"command\":\"Z5_hore\"}");
-        client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[4, 5]}");
-        client.subscribe("ACM1");
-        
-        Serial.println("Button 4 is pressed  Roleta hore");
-    }
-    // Check if pressed
-    if (buttonsA7.onPress(5))
-    {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[80]}");
-        client.subscribe("ACM1");
-        Serial.println("Button 5 is pressed");
-    }
-    // Check if pressed
-    if (buttonsA7.onPress(6))
-    {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[8, 9]}");
-        client.subscribe("ACM1");
-        Serial.println("Button 6 is pressed");
-    }
-*/
-/* Move this section up to where the button pressed is defined through function encapsulation
-    // Check if pressed
-    // if (buttonsA6.onPress(0))
-    // {
-    //     Serial.println("Button 0 is pressed");
-    // }
-    // Check if pressed
-    if (buttonsA6.onPress(1))
-    {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[9]}");
-        client.subscribe("ACM1");
-        Serial.println("Button buttonsA6 1 is pressed");
-    }
-    // Check if pressed
-    if (buttonsA6.onPress(2))
-    {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[10]}");
-        client.subscribe("ACM1");
-        Serial.println("Button buttonsA6 2 is pressed");
-    }
-    // Check if pressed
-    if (buttonsA6.onPress(3))
-    {
-        // client.publish("ACM1", "{\"action\":\"rolety\",\"command\":\"Z6_dole\"}");
-        client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[4, 5]}");
-        client.subscribe("ACM1");
-        Serial.println("Button buttonsA6 3 is pressed");
-    }
-    // Check if pressed
-    if (buttonsA6.onPress(4))
-    {
-        // client.publish("ACM1", "{\"action\":\"rolety\",\"command\":\"Z6_hore\"}");
-        client.publish("ACM1", "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[4, 5]}");
-        client.subscribe("ACM1");
-        Serial.println("Button buttonsA6 4 is pressed");
-    }
-    // Check if pressed
-    if (buttonsA6.onPress(5))
-    {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[12]}");
-        client.subscribe("ACM1");
-        Serial.println("Button buttonsA6 5 is pressed");
-    }
-    // Check if pressed
-    if (buttonsA6.onPress(6))
-    {
-        client.publish("ACM0", "{\"action\":\"toggle\",\"output\":[7]}");
-        client.subscribe("ACM1");
-        Serial.println("Button buttonsA6 6 is pressed");
-    }
-*/
 
     // MQTT connect & reconnect
     if (!client.connected())
