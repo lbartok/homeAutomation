@@ -25,16 +25,12 @@ EthernetClient ethClient;
 PubSubClient client(ethClient);
 long lastReconnectAttempt = 0;
 
-const byte eepromOffset = 0;
-const unsigned long upCourseTime = 68 * 1000;
-const unsigned long downCourseTime = 63 * 1000;
-const float calibrationRatio = 0.1;
-
+/* New shutter code */
 void shuttersOperationHandler(Shutters* s, ShuttersOperation operation) {
-    for (int s0 = 0; s0 <= BLINDS_TOTAL; s0++) {
-        Shutters* shut = blindsArray[s0];
+    for (int s0 = 0; s0 < BLINDS_TOTAL; s0++) {
+        Shutters* shut0 = blindsArray[s0];
 
-        if (s == (*shut)) {
+        if (s == shut0) {
             // this callback was called from the shutters[s0]
             controllPin = BLINDS[s0];
             directionPin = controllPin + 1;
@@ -79,10 +75,10 @@ void shuttersWriteStateHandler(Shutters* shutters, const char* state, byte lengt
 }
 
 void onShuttersLevelReached(Shutters* shutters, byte level) {
-    for (int s3 = 0; s3 <= BLINDS_TOTAL; s3++) {
-        Shutters* shut = blindsArray[s3];
+    for (int s3 = 0; s3 < BLINDS_TOTAL; s3++) {
+        Shutters* shut3 = blindsArray[s3];
 
-        if (shutters == (*shut)) {
+        if (shutters == shut3) {
             Serial.print(s3);
             Serial.print("> Shutter at ");
             Serial.print(level);
@@ -91,13 +87,7 @@ void onShuttersLevelReached(Shutters* shutters, byte level) {
     }
 }
 
-Shutters spalna;
-Shutters chodba;
-Shutters detska1;
-Shutters detska2;
-Shutters kuchyna;
-Shutters obyvacka;
-Shutters* blindsArray[BLINDS_TOTAL] = { &spalna, &chodba, &detska1, &detska2, &kuchyna, &obyvacka };
+
 /* New shutter code end */
 
 // main toggle function for lights (and others)
@@ -136,7 +126,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
         {
             // set the blind to work with
             int blind = root["output"][y];
-            Shutters* shut0 = blindsArray[blind];
+            Shutters* shutB = blindsArray[blind];
             
             // prcnt should be between 0 (all the way up) and 100 (all the way down)
             int percentage = root["prcnt"];
@@ -147,7 +137,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
                 percentage = 0;
             }
 
-            (*shut0).setLevel(percentage);
+            (*shutB).setLevel(percentage);
         }
     }
 
@@ -217,20 +207,20 @@ void setup()
     #endif
 
     // initialize shutters
-    for (int s1 = 0; s1 <= BLINDS_TOTAL; s1++) {
-        Shutters* shut = blindsArray[s1];
+    for (int s1 = 0; s1 < BLINDS_TOTAL; s1++) {
+        Shutters* shut1 = blindsArray[s1];
 
-        char storedShuttersState[(*shut).getStateLength()];
-        shuttersReadState(shut, storedShuttersState, (*shut).getStateLength());
+        char storedShuttersState[(*shut1).getStateLength()];
+        readInEeprom(storedShuttersState, (*shut1).getStateLength());
 
-        (*shut)
+        (*shut1)
             .setOperationHandler(shuttersOperationHandler)
             .setWriteStateHandler(shuttersWriteStateHandler)
             .restoreState(storedShuttersState)
             .setCourseTime(upCourseTime, downCourseTime)
             .onLevelReached(onShuttersLevelReached)
             .begin();
-            .setLevel(0); // Go to 0% (hopefully all-the-way up)
+        (*shut1).setLevel(0); // Go to 0% (hopefully all-the-way up)
     }
     /* New shutters code end */
 
@@ -258,9 +248,9 @@ void loop()
 {
     // rolety / blinds
     /* New shutters code */
-    for (int s2 = 0; s2 <= BLINDS_TOTAL; s2++) {
-        Shutters* shut = blindsArray[s2];
-        shut.loop();
+    for (int s2 = 0; s2 < BLINDS_TOTAL; s2++) {
+        Shutters* shut2 = blindsArray[s2];
+        (*shut2).loop();
     }
     /* New shutters code end */
 

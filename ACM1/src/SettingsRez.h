@@ -150,6 +150,20 @@ unsigned int directionPin = 0;
 const int BLINDS_TOTAL = 6;
 const int BLINDS[BLINDS_TOTAL] = {
     CONTROLLINO_R2, CONTROLLINO_R4, CONTROLLINO_R6, CONTROLLINO_R8, CONTROLLINO_R10, CONTROLLINO_R12
-}
+};
+
+const byte eepromOffset = 0;
+const unsigned long upCourseTime = 68 * 1000;
+const unsigned long downCourseTime = 63 * 1000;
+const float calibrationRatio = 0.1;
+
+Shutters spalna;
+Shutters chodba;
+Shutters detska1;
+Shutters detska2;
+Shutters kuchyna;
+Shutters obyvacka;
+Shutters* blindsArray[BLINDS_TOTAL] = { &spalna, &chodba, &detska1, &detska2, &kuchyna, &obyvacka };
+
 
 #endif
