@@ -156,25 +156,6 @@ void loop()
         PUSH_BUTTONS_DEF[p3].update();
     }
 
-    // only for testing purposes... not working anyway.. :'(
-    if (aMbtrigger == 1) {
-        analogWrite(MQTTpin, dirMapped);
-        aMbtrigger = 0;
-
-        Serial.print("Expect pin #");
-        Serial.print(MQTTpin);
-        Serial.print(" read state: ");
-        Serial.print(dirMapped);
-        Serial.print("/");
-        Serial.println(dir);
-        Serial.print(MQTTpin);
-        Serial.print(" read state: (analog) ");
-        Serial.print(analogRead(MQTTpin));
-        Serial.print(" / (digital) ");
-        Serial.println(digitalRead(MQTTpin));
-        Serial.println("----------------------------");
-    }
-
     // Analog
     buttonsA0.update();
     buttonsA1.update();
@@ -183,14 +164,6 @@ void loop()
     buttonsA13.update();
     buttonsA14.update();
     buttonsA15.update();
-    /* --> Not working!!! do not know why <--
-    for (int aB2 = 0; aB2 < ANALOG_BUTTONS_TOTAL; aB2++)
-    {
-        //AnalogMultiButton AMBobject = *ANALOG_BUTTONS_DEF[aB2];
-        AnalogMultiButton *p0 = ANALOG_BUTTONS_DEF[aB2];
-        AnalogMultiButton AMBobject = *p0;
-        AMBobject.update();
-    }*/
 
     // Check if button is pressed
     for (int aBarray = 0; aBarray < ANALOG_BUTTONS_TOTAL; aBarray++) {
