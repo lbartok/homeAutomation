@@ -67,7 +67,7 @@ const char* ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
             "ACM1", //Button 1
             "ACM1", //Button 2
             "ACM0", //Button 3
-            "",     //Button 4
+            "ACM0", //Button 4
             "ACM1", //Button 5
             "ACM1"  //Button 6
         },{ //A4
@@ -91,7 +91,7 @@ const char* ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
             "ACM0", //Button 1
             "ACM0", //Button 2
             "ACM0", //Button 3
-            "",     //Button 4
+            "ACM0", //Button 4
             "ACM0", //Button 5
             "ACM0"  //Button 6
         },{ //A15
@@ -126,7 +126,7 @@ const char* ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
             "{\"action\":\"toggle\",\"output\":[2]}",   //Button 1
             "{\"action\":\"toggle\",\"output\":[3]}",   //Button 2
             "{\"action\":\"toggle\",\"output\":[45]}",  //Button 3
-            "",                                         //Button 4
+            "{\"action\":\"toggle\",\"output\":[78]}",  //Button 4
             "{\"action\":\"toggle\",\"output\":[11]}",  //Button 5
             "{\"action\":\"toggle\",\"output\":[7]}"    //Button 6
         },{ //A4
@@ -150,7 +150,7 @@ const char* ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
             "{\"action\":\"toggle\",\"output\":[12]}",  //Button 1
             "{\"action\":\"toggle\",\"output\":[4]}",   //Button 2
             "{\"action\":\"toggle\",\"output\":[78]}",  //Button 3
-            "",                                         //Button 4
+            "{\"action\":\"toggle\",\"output\":[78]}",  //Button 4
             "{\"action\":\"toggle\",\"output\":[79]}",  //Button 5
             "{\"action\":\"toggle\",\"output\":[80]}"   //Button 6
         },{ //A15
