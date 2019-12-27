@@ -140,4 +140,30 @@ const char* PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
     }
 };
 
+
+// ---------------------------------------------------------------------------------
+// OUTPUT DEFINITION
+// ---------------------------------------------------------------------------------
+
+// outputs definition array for being able to read the state through function
+const int OUTPUT_DEF_ARRAY[] = {
+    CONTROLLINO_D0,
+    CONTROLLINO_D1,
+    CONTROLLINO_D2,
+    CONTROLLINO_D3,
+    CONTROLLINO_D4,
+    CONTROLLINO_D5,
+    CONTROLLINO_D6,
+    CONTROLLINO_D7,
+    CONTROLLINO_D8,
+    CONTROLLINO_D9,
+    CONTROLLINO_D10,
+    CONTROLLINO_D11,
+    CONTROLLINO_D12,
+    CONTROLLINO_D13,
+    CONTROLLINO_D14,
+    CONTROLLINO_R14,
+    CONTROLLINO_R15
+};
+
 #endif
