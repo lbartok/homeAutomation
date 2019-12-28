@@ -163,6 +163,7 @@ Shutters detska1;
 Shutters detska2;
 Shutters kuchyna;
 Shutters obyvacka;
+// the order of the blinds needs to be the same as in the BLINDS array above
 Shutters* blindsArray[BLINDS_TOTAL] = { &spalna, &chodba, &detska1, &detska2, &kuchyna, &obyvacka };
 
 

@@ -26,11 +26,25 @@ PubSubClient client(ethClient);
 long lastReconnectAttempt = 0;
 
 /* New shutter code */
+/*
+int getShutterIndex(Shutters* s) {
+  for (size_t i = 1; i <= NUMBER_OF_SHUTTERS; i++)
+    if (s == &s1)
+      return 1;
+    if (s == &s2)
+      return 2;
+
+  return -1;
+}
+*/
+Shutters* resolveShutter(int index) {
+  return blindsArray[index];
+}
+
 void shuttersOperationHandler(Shutters* s, ShuttersOperation operation) {
     for (int s0 = 0; s0 < BLINDS_TOTAL; s0++) {
-        Shutters* shut0 = blindsArray[s0];
-
-        if (s == shut0) {
+        //Shutters* shut0 = blindsArray[s0];
+        if (s == blindsArray[s0]) {
             // this callback was called from the shutters[s0]
             controllPin = BLINDS[s0];
             directionPin = controllPin + 1;
@@ -39,23 +53,23 @@ void shuttersOperationHandler(Shutters* s, ShuttersOperation operation) {
 
     switch (operation) {
         case ShuttersOperation::UP:
-        Serial.println("Shutters going up.");
-        // TODO: Implement the code for the shutters to go up
-        digitalWrite(directionPin, LOW);
-        digitalWrite(controllPin, HIGH);
-        break;
+            Serial.println("Shutters going up.");
+            // TODO: Implement the code for the shutters to go up
+            digitalWrite(directionPin, LOW);
+            digitalWrite(controllPin, HIGH);
+            break;
         case ShuttersOperation::DOWN:
-        Serial.println("Shutters going down.");
-        // TODO: Implement the code for the shutters to go down
-        digitalWrite(directionPin, HIGH);
-        digitalWrite(controllPin, HIGH);
-        break;
+            Serial.println("Shutters going down.");
+            // TODO: Implement the code for the shutters to go down
+            digitalWrite(directionPin, HIGH);
+            digitalWrite(controllPin, HIGH);
+            break;
         case ShuttersOperation::HALT:
-        Serial.println("Shutters halting.");
-        // TODO: Implement the code for the shutters to halt
-        digitalWrite(directionPin, LOW);
-        digitalWrite(controllPin, LOW);
-        break;
+            Serial.println("Shutters halting.");
+            // TODO: Implement the code for the shutters to halt
+            digitalWrite(directionPin, LOW);
+            digitalWrite(controllPin, LOW);
+            break;
     }
 }
 
@@ -76,9 +90,9 @@ void shuttersWriteStateHandler(Shutters* shutters, const char* state, byte lengt
 
 void onShuttersLevelReached(Shutters* shutters, byte level) {
     for (int s3 = 0; s3 < BLINDS_TOTAL; s3++) {
-        Shutters* shut3 = blindsArray[s3];
+        //Shutters* shut3 = blindsArray[s3];
 
-        if (shutters == shut3) {
+        if (shutters == blindsArray[s3]) {
             Serial.print(s3);
             Serial.print("> Shutter at ");
             Serial.print(level);
@@ -126,7 +140,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
         {
             // set the blind to work with
             int blind = root["output"][y];
-            Shutters* shutB = blindsArray[blind];
+            Shutters* shutB = resolveShutter(blind);
             
             // prcnt should be between 0 (all the way up) and 100 (all the way down)
             int percentage = root["prcnt"];
@@ -208,7 +222,7 @@ void setup()
 
     // initialize shutters
     for (int s1 = 0; s1 < BLINDS_TOTAL; s1++) {
-        Shutters* shut1 = blindsArray[s1];
+        Shutters* shut1 = resolveShutter(s1);
 
         char storedShuttersState[(*shut1).getStateLength()];
         readInEeprom(storedShuttersState, (*shut1).getStateLength());
@@ -249,7 +263,7 @@ void loop()
     // rolety / blinds
     /* New shutters code */
     for (int s2 = 0; s2 < BLINDS_TOTAL; s2++) {
-        Shutters* shut2 = blindsArray[s2];
+        Shutters* shut2 = resolveShutter(s2);
         (*shut2).loop();
     }
     /* New shutters code end */
