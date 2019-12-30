@@ -109,16 +109,16 @@ const char* ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
             "",                                             //Button 0
             "{\"action\":\"toggle\",\"output\":[5, 6]}",    //Button 1
             "{\"action\":\"toggle\",\"output\":[5, 6]}",    //Button 2
-            "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[2]}", //Button 3
-            "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[2]}",   //Button 4
+            "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[2]}", //Button 3
+            "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[2]}",   //Button 4
             "{\"action\":\"toggle\",\"output\":[11]}",      //Button 5
             "{\"action\":\"toggle\",\"output\":[9]}"        //Button 6
         },{ //A1
             "",                                             //Button 0
             "{\"action\":\"toggle\",\"output\":[5, 6]}",    //Button 1
             "{\"action\":\"toggle\",\"output\":[5, 6]}",    //Button 2
-            "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[3]}", //Button 3
-            "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[3]}",   //Button 4
+            "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[3]}", //Button 3
+            "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[3]}",   //Button 4
             "{\"action\":\"toggle\",\"output\":[11]}",      //Button 5
             "{\"action\":\"toggle\",\"output\":[10]}"       //Button 6
         },{ //A2
@@ -133,16 +133,16 @@ const char* ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
             "",                                         //Button 0
             "{\"action\":\"toggle\",\"output\":[2]}",   //Button 1
             "{\"action\":\"toggle\",\"output\":[3]}",   //Button 2
-            "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[1]}", //Button 3
-            "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[1]}",   //Button 4
+            "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[1]}", //Button 3
+            "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[1]}",   //Button 4
             "{\"action\":\"toggle\",\"output\":[7]}",   //Button 5
             "{\"action\":\"toggle\",\"output\":[42]}"   //Button 6
         },{ //A13
             "",                                         //Button 0
             "{\"action\":\"toggle\",\"output\":[13]}",  //Button 1
             "{\"action\":\"toggle\",\"output\":[13]}",  //Button 2
-            "{\"action\":\"rolety\",\"direction\":\"down\",\"output\":[0]}", //Button 3
-            "{\"action\":\"rolety\",\"direction\":\"up\",\"output\":[0]}",   //Button 4
+            "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[0]}", //Button 3
+            "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[0]}",   //Button 4
             "{\"action\":\"toggle\",\"output\":[11]}",  //Button 5
             "{\"action\":\"toggle\",\"output\":[11]}"   //Button 6
         },{ //A14
