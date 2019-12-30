@@ -27,81 +27,88 @@ long lastReconnectAttempt = 0;
 
 /* New shutter code */
 /*
+// Placeholder function to get shutter index in the array
 int getShutterIndex(Shutters* s) {
-  for (size_t i = 1; i <= NUMBER_OF_SHUTTERS; i++)
-    if (s == &s1)
-      return 1;
-    if (s == &s2)
-      return 2;
+  for (size_t i = 0; i < BLINDS_TOTAL; i++)
+    if (s == resolveShutter[i])
+      return i;
 
   return -1;
 }
 */
+
+// Function to correctly return Shutter based on position in the array
 Shutters* resolveShutter(int index) {
   return blindsArray[index];
 }
 
+// Main function handling operation of each shutter
 void shuttersOperationHandler(Shutters* s, ShuttersOperation operation) {
     for (int s0 = 0; s0 < BLINDS_TOTAL; s0++) {
-        //Shutters* shut0 = blindsArray[s0];
-        if (s == blindsArray[s0]) {
-            // this callback was called from the shutters[s0]
+        if (s == resolveShutter(s0)) {
+            // this callback was called from the blindsArray[s0]
             controllPin = BLINDS[s0];
             directionPin = controllPin + 1;
+
+            // to be removed when working
+            Serial.print("Working on blind #");
+            Serial.println(s0);
+            Serial.println("Set pins as follows:");
+            Serial.print("controllPin/directionPin: ");
+            Serial.print(controllPin);
+            Serial.print("/");
+            Serial.println(directionPin);
+            // end (to be removed)
+            
+            break;
         }
     }
 
     switch (operation) {
         case ShuttersOperation::UP:
             Serial.println("Shutters going up.");
-            // TODO: Implement the code for the shutters to go up
+            // Code for the shutters to go up
             digitalWrite(directionPin, LOW);
             digitalWrite(controllPin, HIGH);
             break;
         case ShuttersOperation::DOWN:
             Serial.println("Shutters going down.");
-            // TODO: Implement the code for the shutters to go down
+            // Code for the shutters to go down
             digitalWrite(directionPin, HIGH);
             digitalWrite(controllPin, HIGH);
             break;
         case ShuttersOperation::HALT:
             Serial.println("Shutters halting.");
-            // TODO: Implement the code for the shutters to halt
+            // Code for the shutters to halt
             digitalWrite(directionPin, LOW);
             digitalWrite(controllPin, LOW);
             break;
     }
 }
 
+// Function to read shutters level from EEPROM
 void readInEeprom(char* dest, byte length) {
-    for (byte i = 0; i < length; i++) {
-        dest[i] = EEPROM.read(eepromOffset + i);
-    }
+  for (byte i = 0; i < length; i++) {
+    dest[i] = EEPROM.read(eepromOffset + i);
+  }
 }
 
+// Function to store shutters level in EEPROM
 void shuttersWriteStateHandler(Shutters* shutters, const char* state, byte length) {
-    for (byte i = 0; i < length; i++) {
-        EEPROM.write(eepromOffset + i, state[i]);
-        #ifdef ESP8266
-        EEPROM.commit();
-        #endif
-    }
+  for (byte i = 0; i < length; i++) {
+    EEPROM.write(eepromOffset + i, state[i]);
+    #ifdef ESP8266
+    EEPROM.commit();
+    #endif
+  }
 }
 
+// Shutters level reached code to announce each whole percent
 void onShuttersLevelReached(Shutters* shutters, byte level) {
-    for (int s3 = 0; s3 < BLINDS_TOTAL; s3++) {
-        //Shutters* shut3 = blindsArray[s3];
-
-        if (shutters == blindsArray[s3]) {
-            Serial.print(s3);
-            Serial.print("> Shutter at ");
-            Serial.print(level);
-            Serial.println("%");
-        }
-    }
+  Serial.print("Shutters at ");
+  Serial.print(level);
+  Serial.println("%.");
 }
-
-
 /* New shutter code end */
 
 // main toggle function for lights (and others)
@@ -143,7 +150,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
             Shutters* shutB = resolveShutter(blind);
             
             // prcnt should be between 0 (all the way up) and 100 (all the way down)
-            int percentage = root["prcnt"];
+            uint8_t percentage = uint8_t(root["prcnt"]);
             // safeguard for overweighting prcnt value
             if (percentage > 100) {
                 percentage = 100;
@@ -151,6 +158,17 @@ void callback(char *topic, byte *payload, unsigned int length) {
                 percentage = 0;
             }
 
+            // to be removed when all working
+            Serial.print("Setting new level for blind #");
+            Serial.print(blind);
+            Serial.print(" to go from ");
+            Serial.print((*shutB).getCurrentLevel());
+            Serial.print("% to ");
+            Serial.print(percentage);
+            Serial.println("%.");
+            // end (to be removed)
+
+            // move the blind to the newly requested level
             (*shutB).setLevel(percentage);
         }
     }
@@ -197,13 +215,20 @@ void checkPressedButton(Button &btn)
 }
 
 
-
 void setup()
 {
     // begin serial so we can see which buttons are being pressed through the serial monitor
     Serial.begin(9600);
-    Serial.println("Init");
+    
+    /* New shutters code */
+    delay(100);
+    #ifdef ESP8266
+    EEPROM.begin(512);
+    #endif
+    /* New shutters code end */
 
+    Serial.println("Init");
+    
     // create MQTT
     client.setServer(server, 1883);
     client.setCallback(callback);
@@ -216,25 +241,38 @@ void setup()
     lastReconnectAttempt = 0;
 
     /* New shutters code */
-    #ifdef ESP8266
-    EEPROM.begin(512);
-    #endif
-
-    // initialize shutters
+    
+    // Initialize shutters
     for (int s1 = 0; s1 < BLINDS_TOTAL; s1++) {
+        // set the shutter to work with
         Shutters* shut1 = resolveShutter(s1);
 
+        // get the last stored state of the shutter
         char storedShuttersState[(*shut1).getStateLength()];
         readInEeprom(storedShuttersState, (*shut1).getStateLength());
 
+        // to be removed when working
+        Serial.println("Initializing shutters.");
+        Serial.print("Current level (pre-init): ");
+        Serial.println((*shut1).getCurrentLevel());
+        Serial.print("storedShuttersState: ");
+        Serial.println(storedShuttersState);
+        // end (to be removed)
+
+        // Initialize the shutter
         (*shut1)
             .setOperationHandler(shuttersOperationHandler)
             .setWriteStateHandler(shuttersWriteStateHandler)
             .restoreState(storedShuttersState)
             .setCourseTime(upCourseTime, downCourseTime)
             .onLevelReached(onShuttersLevelReached)
-            .begin();
-        (*shut1).setLevel(0); // Go to 0% (hopefully all-the-way up)
+            .begin()
+            .setLevel(100); // Go to 100% (all-the-way down)
+
+        // to be removed when working
+        Serial.print("Level after init: ");
+        Serial.println((*shut1).getCurrentLevel());
+        // end (to be removed)
     }
     /* New shutters code end */
 
@@ -260,21 +298,19 @@ void setup()
 
 void loop()
 {
-    // rolety / blinds
-    /* New shutters code */
+    // rolety / blinds - New shutters code
     for (int s2 = 0; s2 < BLINDS_TOTAL; s2++) {
         Shutters* shut2 = resolveShutter(s2);
         (*shut2).loop();
     }
-    /* New shutters code end */
 
-    // Digital
+    // Digital buttons
     for (int p3 = 0; p3 < PUSH_BUTTONS_TOTAL; p3++)
     {
         PUSH_BUTTONS_DEF[p3].update();
     }
     
-    // Analog
+    // Analog buttons
     buttonsA6.update();
     buttonsA7.update();
     
