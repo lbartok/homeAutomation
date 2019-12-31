@@ -49,17 +49,6 @@ void shuttersOperationHandler(Shutters* s, ShuttersOperation operation) {
             // this callback was called from the blindsArray[s0]
             controllPin = BLINDS[s0];
             directionPin = controllPin + 1;
-
-            // to be removed when working
-            Serial.print("Working on blind #");
-            Serial.println(s0);
-            Serial.println("Set pins as follows:");
-            Serial.print("controllPin/directionPin: ");
-            Serial.print(controllPin);
-            Serial.print("/");
-            Serial.println(directionPin);
-            // end (to be removed)
-            
             break;
         }
     }
@@ -158,15 +147,15 @@ void callback(char *topic, byte *payload, unsigned int length) {
                 percentage = 0;
             }
 
-            // to be removed when all working
-            Serial.print("Setting new level for blind #");
-            Serial.print(blind);
-            Serial.print(" to go from ");
-            Serial.print((*shutB).getCurrentLevel());
-            Serial.print("% to ");
-            Serial.print(percentage);
-            Serial.println("%.");
-            // end (to be removed)
+            // check whether the blind is running when button has been pressed again
+            if ((*shutB).isIdle() != true && (percentage == 0 || percentage == 100)) {
+                (*shutB).stop();
+
+                // to be removed when all working
+                Serial.println("Sensed button pressed again hence stopping blind.");
+                // end (to be removed)
+                break;
+            };
 
             // move the blind to the newly requested level
             (*shutB).setLevel(percentage);
@@ -251,14 +240,6 @@ void setup()
         char storedShuttersState[(*shut1).getStateLength()];
         readInEeprom(storedShuttersState, (*shut1).getStateLength());
 
-        // to be removed when working
-        Serial.println("Initializing shutters.");
-        Serial.print("Current level (pre-init): ");
-        Serial.println((*shut1).getCurrentLevel());
-        Serial.print("storedShuttersState: ");
-        Serial.println(storedShuttersState);
-        // end (to be removed)
-
         // Initialize the shutter
         (*shut1)
             .setOperationHandler(shuttersOperationHandler)
@@ -268,11 +249,6 @@ void setup()
             .onLevelReached(onShuttersLevelReached)
             .begin()
             .setLevel(100); // Go to 100% (all-the-way down)
-
-        // to be removed when working
-        Serial.print("Level after init: ");
-        Serial.println((*shut1).getCurrentLevel());
-        // end (to be removed)
     }
     /* New shutters code end */
 
