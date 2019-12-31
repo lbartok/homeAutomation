@@ -27,32 +27,8 @@ void toggle(int pin)
     digitalWrite(pin, !digitalRead(pin));
 }
 
-// for testing purposes, to be deleted
-bool aMbtrigger = 0;
-int dir = 0;
-long dirMapped = 0;
-int MQTTpin = -1;
-
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length) {
-    // const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 50;
-    // DynamicJsonBuffer jsonBuffer(capacity);
-
-    // const char *json = "{\"action\":\"toggle\",\"output\":[1,2,3,4,9,9,9,9,9,9]}";
-    // JsonObject& root = jsonBuffer.parseObject(json);
-
-    // handle message arrived
-    // Serial.print("[");
-    // Serial.print(topic);
-    // Serial.print("] ");
-    // for (unsigned int i = 0; i < length; i++)
-    // {
-    //     Serial.print((char)payload[i]);
-    // }
-    // Serial.println();
-
-    // JsonObject &root = jsonBuffer.parseObject(payload);
-    // if (root.success()){
 
     const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 30;
     DynamicJsonDocument root(capacity);
