@@ -25,6 +25,32 @@ EthernetClient ethClient;
 PubSubClient client(ethClient);
 long lastReconnectAttempt = 0;
 
+// Function to check if the requested pin is controlling Blinds
+int checkBlindsPin(int pin) {
+    for (int pI = 0; pI < BLINDS_TOTAL; pI++) {
+        if (pin == BLINDS[pI] || pin == (BLINDS[pI] + 1)) {
+            return pI;
+        }
+    }
+
+    // needs to be more than BLINDS_TOTAL
+    return 10000;
+}
+
+// Helper function to escape "" from char variable
+/*
+char* escapeChar(String sentence) {
+    // declaring character array : response
+    char* response[sentence.length()] = {}; 
+  
+    unsigned int e; 
+    for (e = 0; e < sizeof(response); e++) { 
+        strcat(response[e],(char*)(sentence[e])); 
+    } 
+    return (char*)(response);
+}
+*/
+
 /* New shutter code */
 /*
 // Placeholder function to get shutter index in the array
@@ -154,12 +180,104 @@ void callback(char *topic, byte *payload, unsigned int length) {
                 // to be removed when all working
                 Serial.println("Sensed button pressed again hence stopping blind.");
                 // end (to be removed)
-                break;
-            };
-
-            // move the blind to the newly requested level
-            (*shutB).setLevel(percentage);
+            } else {
+                // move the blind to the newly requested level
+                (*shutB).setLevel(percentage);
+            }
         }
+    }
+
+    // state handling
+    if (strcmp(action, "state") == 0) {
+        // construct JSON object - state
+        const size_t stateCapacity = JSON_ARRAY_SIZE(30) + JSON_OBJECT_SIZE(2) + 30;
+        DynamicJsonDocument state(stateCapacity);
+
+        // add controllino key
+        state["controllino"] = "ACM1";
+        //state["timestamp"] = millis();
+
+        // add new nested object for actual state data
+        //JsonArray state_d = state.createNestedArray("state_data");
+        JsonObject state_data = state.createNestedObject();
+
+        // output should be all the outputs whose state is requested e.g.:[2,3,78,80] or [all]
+        for (unsigned int y = 0; y < root["output"].size(); y++)
+        {
+            // when the request for state is for all devices connected
+            if (strcmp(root["output"][y], "all") == 0) {
+                // output of all the digital outputs connected to controllino
+                for (unsigned int st = 0; st < TOTAL_OUTPUT_DEF_ARRAY; st++) {
+                    int output = OUTPUT_DEF_ARRAY[st];
+                    bool outputState = digitalRead(output);
+
+                    // write state to JSON document
+                    state_data[String(output)].set(outputState);
+                }
+
+                // output of all the blinds
+                for (unsigned int st = 0; st < BLINDS_TOTAL; st++) {
+                    Shutters* blindOutput = resolveShutter(st);
+                    int blindOutputState = (*blindOutput).getCurrentLevel();
+
+                    // TODO write state to JSON document
+                    state_data[String(BLINDS[st])] = blindOutputState;
+                    // TODO or write it as nested array with isIdle info
+                    //!char blindPin = char(BLINDS[st]);
+                    //!JsonArray blindData = state_data.createNestedArray(blindPin);
+                    //!blindData.add(blindOutputState);
+                    //!blindData.add((*blindOutput).isIdle());
+                }
+            // when the request for state is for few particular digital output pin(s)
+            } else {
+                Serial.println("Going through single pin state.");
+                int output = root["output"][y];
+                // check if state request is for a blind
+                int blindNum = checkBlindsPin(output);
+                if (blindNum < BLINDS_TOTAL) {
+                    Shutters* blindOutput = resolveShutter(blindNum);
+                    int blindOutputState = (*blindOutput).getCurrentLevel();
+
+                    // TODO write state to JSON document
+                    state_data[String(BLINDS[blindNum])] = blindOutputState;
+                    // TODO or write it as nested array with isIdle info
+                    //!JsonArray blindData = state_data.createNestedArray(char(BLINDS[sto]));
+                    //!blindData.add(blindOutputState);
+                    //!blindData.add((*blindOutput).isIdle());
+                // when request is for simple digital output
+                } else {
+                    bool outputState = digitalRead(output);
+
+                    // write state to JSON document
+                    Serial.print("Written to JSON: ");
+                    Serial.print(output);
+                    Serial.print(" > ");
+                    Serial.println(state_data[String(output)].set(outputState));
+                }
+            }
+        }
+        // set the JSON object to the main JSON document
+        state["state_data"].set(state_data);
+        
+        // define variable to hold state for publish purposes
+        String state2pub = "";
+        serializeJson(state, state2pub);
+        // escape quote chars in the serialized input
+        //char* state2pubEsc = escapeChar(state2pub);
+
+        // to be removed when working (testing only)
+        // print JSON onto Serial interface 
+        Serial.println("JSON Pretty:");
+        serializeJsonPretty(state, Serial);
+        Serial.println();
+        Serial.print("state2pub: ");
+        Serial.println(state2pub);
+        // end (to be removed)
+
+        // publish state to requestor
+        //client.publish("STATE", state2pub);
+        // ... resubscribe
+        //client.subscribe("ACM1");
     }
 
     if (strcmp(action, "info") == 0)
