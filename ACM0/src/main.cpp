@@ -108,9 +108,10 @@ void callback(char *topic, byte *payload, unsigned int length) {
         // end (to be removed)
 
         // publish state to requestor
+        // TODO: convert state2pub to char*
         //client.publish("STATE", state2pub);
         // ... resubscribe
-        //client.subscribe("ACM0");
+        client.subscribe("ACM0");
     }
 
     if (strcmp(action, "info") == 0)

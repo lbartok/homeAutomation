@@ -222,7 +222,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
                     // write state to JSON document
                     //state_data[String(BLINDS[st])] = blindOutputState;
-                    // TODO or write it as nested array with isIdle info
+                    //* or write it as nested array with isIdle info
                     JsonArray blindData = state_data.createNestedArray(String(BLINDS[st]));
                     blindData.add(blindOutputState);
                     blindData.add((*blindOutput).isIdle());
@@ -239,7 +239,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
 
                     // write state to JSON document
                     //state_data[String(BLINDS[blindNum])] = blindOutputState;
-                    // TODO or write it as nested array with isIdle info
+                    //* or write it as nested array with isIdle info
                     JsonArray blindData = state_data.createNestedArray(String(BLINDS[blindNum]));
                     blindData.add(blindOutputState);
                     blindData.add((*blindOutput).isIdle());
@@ -262,7 +262,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
         // define variable to hold state for publish purposes
         String state2pub = "";
         serializeJson(state, state2pub);
-        // escape quote chars in the serialized input
+        // TODO: escape quote chars in the serialized input
         //char* state2pubEsc = escapeChar(state2pub);
 
         // to be removed when working (testing only)
@@ -275,9 +275,10 @@ void callback(char *topic, byte *payload, unsigned int length) {
         // end (to be removed)
 
         // publish state to requestor
+        // TODO: convert state2pub to char*
         //client.publish("STATE", state2pub);
         // ... resubscribe
-        //client.subscribe("ACM1");
+        client.subscribe("ACM1");
     }
 
     if (strcmp(action, "info") == 0)
