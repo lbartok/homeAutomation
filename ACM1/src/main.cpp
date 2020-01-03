@@ -190,16 +190,16 @@ void callback(char *topic, byte *payload, unsigned int length) {
     // state handling
     if (strcmp(action, "state") == 0) {
         // construct JSON object - state
-        const size_t stateCapacity = JSON_ARRAY_SIZE(30) + JSON_OBJECT_SIZE(2) + 30;
+        const size_t stateCapacity = JSON_ARRAY_SIZE(40) + JSON_OBJECT_SIZE(2) + 30;
         DynamicJsonDocument state(stateCapacity);
 
         // add controllino key
         state["controllino"] = "ACM1";
         //state["timestamp"] = millis();
 
-        // add new nested object for actual state data
-        //JsonArray state_d = state.createNestedArray("state_data");
-        JsonObject state_data = state.createNestedObject();
+        // construct supporting JSON object - state_data
+        const size_t stateCapacity2 = JSON_ARRAY_SIZE(3) + JSON_OBJECT_SIZE(40) + 30;
+        DynamicJsonDocument state_data(stateCapacity2);
 
         // output should be all the outputs whose state is requested e.g.:[2,3,78,80] or [all]
         for (unsigned int y = 0; y < root["output"].size(); y++)
@@ -220,13 +220,12 @@ void callback(char *topic, byte *payload, unsigned int length) {
                     Shutters* blindOutput = resolveShutter(st);
                     int blindOutputState = (*blindOutput).getCurrentLevel();
 
-                    // TODO write state to JSON document
-                    state_data[String(BLINDS[st])] = blindOutputState;
+                    // write state to JSON document
+                    //state_data[String(BLINDS[st])] = blindOutputState;
                     // TODO or write it as nested array with isIdle info
-                    //!char blindPin = char(BLINDS[st]);
-                    //!JsonArray blindData = state_data.createNestedArray(blindPin);
-                    //!blindData.add(blindOutputState);
-                    //!blindData.add((*blindOutput).isIdle());
+                    JsonArray blindData = state_data.createNestedArray(String(BLINDS[st]));
+                    blindData.add(blindOutputState);
+                    blindData.add((*blindOutput).isIdle());
                 }
             // when the request for state is for few particular digital output pin(s)
             } else {
@@ -238,27 +237,28 @@ void callback(char *topic, byte *payload, unsigned int length) {
                     Shutters* blindOutput = resolveShutter(blindNum);
                     int blindOutputState = (*blindOutput).getCurrentLevel();
 
-                    // TODO write state to JSON document
-                    state_data[String(BLINDS[blindNum])] = blindOutputState;
+                    // write state to JSON document
+                    //state_data[String(BLINDS[blindNum])] = blindOutputState;
                     // TODO or write it as nested array with isIdle info
-                    //!JsonArray blindData = state_data.createNestedArray(char(BLINDS[sto]));
-                    //!blindData.add(blindOutputState);
-                    //!blindData.add((*blindOutput).isIdle());
+                    JsonArray blindData = state_data.createNestedArray(String(BLINDS[blindNum]));
+                    blindData.add(blindOutputState);
+                    blindData.add((*blindOutput).isIdle());
                 // when request is for simple digital output
                 } else {
                     bool outputState = digitalRead(output);
 
                     // write state to JSON document
-                    Serial.print("Written to JSON: ");
-                    Serial.print(output);
-                    Serial.print(" > ");
-                    Serial.println(state_data[String(output)].set(outputState));
+                    state_data[String(output)].set(outputState);
                 }
             }
         }
-        // set the JSON object to the main JSON document
-        state["state_data"].set(state_data);
-        
+
+        // convert Json document to String to be inserted into main Json
+        String state_data2pub = "";
+        serializeJson(state_data, state_data2pub);
+        // insert state_data into main Json - state
+        state["state_data"].set(serialized(state_data2pub));
+
         // define variable to hold state for publish purposes
         String state2pub = "";
         serializeJson(state, state2pub);

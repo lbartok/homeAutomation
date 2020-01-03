@@ -206,6 +206,7 @@ const char* PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
 // ---------------------------------------------------------------------------------
 
 // outputs definition array for being able to read the state through function
+const int TOTAL_OUTPUT_DEF_ARRAY = 24;
 const int OUTPUT_DEF_ARRAY[] = {
     CONTROLLINO_D0,
     CONTROLLINO_D1,

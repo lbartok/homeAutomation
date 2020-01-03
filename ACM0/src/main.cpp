@@ -49,6 +49,70 @@ void callback(char *topic, byte *payload, unsigned int length) {
         }
     }
 
+    // state handling
+    if (strcmp(action, "state") == 0) {
+        // construct JSON object - state
+        const size_t stateCapacity = JSON_ARRAY_SIZE(30) + JSON_OBJECT_SIZE(2) + 30;
+        DynamicJsonDocument state(stateCapacity);
+
+        // add controllino key
+        state["controllino"] = "ACM0";
+        //state["timestamp"] = millis();
+
+        // construct supporting JSON object - state_data
+        const size_t stateCapacity2 = JSON_ARRAY_SIZE(0) + JSON_OBJECT_SIZE(30) + 30;
+        DynamicJsonDocument state_data(stateCapacity2);
+
+        // output should be all the outputs whose state is requested e.g.:[2,3,78,80] or [all]
+        for (unsigned int y = 0; y < root["output"].size(); y++)
+        {
+            // when the request for state is for all devices connected
+            if (strcmp(root["output"][y], "all") == 0) {
+                // output of all the digital outputs connected to controllino
+                for (unsigned int st = 0; st < TOTAL_OUTPUT_DEF_ARRAY; st++) {
+                    int output = OUTPUT_DEF_ARRAY[st];
+                    bool outputState = digitalRead(output);
+
+                    // write state to JSON document
+                    state_data[String(output)].set(outputState);
+                }
+            // when the request for state is for few particular digital output pin(s)
+            } else {
+                int output = root["output"][y];
+                bool outputState = digitalRead(output);
+
+                // write state to JSON document
+                state_data[String(output)].set(outputState);
+            }
+        }
+
+        // convert Json document to String to be inserted into main Json
+        String state_data2pub = "";
+        serializeJson(state_data, state_data2pub);
+        // insert state_data into main Json - state
+        state["state_data"].set(serialized(state_data2pub));
+
+        // define variable to hold state for publish purposes
+        String state2pub = "";
+        serializeJson(state, state2pub);
+        // TODO: escape quote chars in the serialized input
+        //char* state2pubEsc = escapeChar(state2pub);
+
+        // to be removed when working (testing only)
+        // print JSON onto Serial interface 
+        Serial.println("JSON Pretty:");
+        serializeJsonPretty(state, Serial);
+        Serial.println();
+        Serial.print("state2pub: ");
+        Serial.println(state2pub);
+        // end (to be removed)
+
+        // publish state to requestor
+        //client.publish("STATE", state2pub);
+        // ... resubscribe
+        //client.subscribe("ACM0");
+    }
+
     if (strcmp(action, "info") == 0)
     {
         Serial.println("ACM0 reconnected...'info' command received.");
