@@ -38,18 +38,28 @@ int checkBlindsPin(int pin) {
 }
 
 // Helper function to escape "" from char variable
-/*
-char* escapeChar(String sentence) {
+// TODO: Need to find function to escape char_32_t
+char * escapeChar(String sentence) {
     // declaring character array : response
-    char* response[sentence.length()] = {}; 
+    // char * response[sentence.length()] = {}; 
   
-    unsigned int e; 
-    for (e = 0; e < sizeof(response); e++) { 
-        strcat(response[e],(char*)(sentence[e])); 
-    } 
-    return (char*)(response);
+    // s is our escaped output string
+    char * s;
+    // loop through all characters
+    for(char c : sentence)
+    {
+        // check if a given character is printable
+        // the cast is necessary to avoid undefined behaviour
+        if(isprint((unsigned char)c))
+            s += c;
+        else
+            s += (92 + c);
+            // s += c;
+    }
+     
+    return s;
 }
-*/
+
 
 /* New shutter code */
 /*
@@ -254,29 +264,29 @@ void callback(char *topic, byte *payload, unsigned int length) {
         }
 
         // convert Json document to String to be inserted into main Json
-        String state_data2pub = "";
+        String state_data2pub;
         serializeJson(state_data, state_data2pub);
         // insert state_data into main Json - state
         state["state_data"].set(serialized(state_data2pub));
 
         // define variable to hold state for publish purposes
-        String state2pub = "";
+        String state2pub;
         serializeJson(state, state2pub);
         // TODO: escape quote chars in the serialized input
-        //char* state2pubEsc = escapeChar(state2pub);
+        char * state2pubEsc = escapeChar(state2pub);
 
         // to be removed when working (testing only)
         // print JSON onto Serial interface 
         Serial.println("JSON Pretty:");
         serializeJsonPretty(state, Serial);
         Serial.println();
-        Serial.print("state2pub: ");
-        Serial.println(state2pub);
+        Serial.print("state2pubEsc: ");
+        Serial.println(state2pubEsc); // TODO: TEST IT!!!
         // end (to be removed)
 
         // publish state to requestor
         // TODO: convert state2pub to char*
-        //client.publish("STATE", state2pub);
+        client.publish("STATE", state2pubEsc);
         // ... resubscribe
         client.subscribe("ACM1");
     }
