@@ -272,21 +272,25 @@ void callback(char *topic, byte *payload, unsigned int length) {
         // define variable to hold state for publish purposes
         String state2pub;
         serializeJson(state, state2pub);
-        // TODO: escape quote chars in the serialized input
-        char * state2pubEsc = escapeChar(state2pub);
-
+        
         // to be removed when working (testing only)
         // print JSON onto Serial interface 
         Serial.println("JSON Pretty:");
         serializeJsonPretty(state, Serial);
         Serial.println();
+
+        char state2pubEsc[state2pub.length()+1];
+        state2pub.toCharArray(state2pubEsc, state2pub.length()+1);
         Serial.print("state2pubEsc: ");
-        Serial.println(state2pubEsc); // TODO: TEST IT!!!
+        Serial.println(state2pubEsc);
         // end (to be removed)
 
         // publish state to requestor
         // TODO: convert state2pub to char*
-        client.publish("STATE", state2pubEsc);
+        if (!client.publish("STATE", state2pubEsc)) {
+            client.publish("STATE","ta nist...");
+        }
+        // client.publish("STATE", (char *) state2pub.c_str());
         // ... resubscribe
         client.subscribe("ACM1");
     }
