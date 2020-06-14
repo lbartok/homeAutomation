@@ -169,10 +169,9 @@ const int OUTPUT_DEF_ARRAY[] = {
 unsigned int controllPin = 0;
 unsigned int directionPin = 0;
 
-const int BLINDS_TOTAL = 5;
+const int BLINDS_TOTAL = 6;
 const int BLINDS[BLINDS_TOTAL] = {
-    CONTROLLINO_R2, CONTROLLINO_R4, CONTROLLINO_R6, CONTROLLINO_R8, CONTROLLINO_R10 //, CONTROLLINO_R12
-};
+    CONTROLLINO_R2, CONTROLLINO_R4, CONTROLLINO_R6, CONTROLLINO_R8, CONTROLLINO_R10, CONTROLLINO_R12};
 
 const byte eepromOffset = 0;
 const unsigned long upCourseTime = 68 * 1000L;
@@ -185,10 +184,9 @@ Shutters chodba;
 Shutters detska1;
 Shutters detska2;
 Shutters kuchyna;
-// Shutters obyvacka;
+Shutters obyvacka;
 // the order of the blinds needs to be the same as in the BLINDS[] array above
 Shutters *blindsArray[BLINDS_TOTAL] = {
-    &spalna, &chodba, &detska1, &detska2, &kuchyna //, &obyvacka
-};
+    &spalna, &chodba, &detska1, &detska2, &kuchyna, &obyvacka};
 
 #endif
