@@ -76,8 +76,8 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
          "",                                                         //Button 0
          "{\"action\":\"toggle\",\"output\":[13, 44]}",              //Button 1
          "{\"action\":\"toggle\",\"output\":[12]}",                  //Button 2
-         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[4]}", //Button 3
-         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[4]}",   //Button 4
+         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[5]}", //Button 3
+         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[5]}",   //Button 4
          "{\"action\":\"toggle\",\"output\":[80]}",                  //Button 5
          "{\"action\":\"toggle\",\"output\":[8, 9]}"                 //Button 6
      }}};
@@ -123,20 +123,20 @@ const char *PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
         "ACM0"  //I18
     },
     {
-        "{\"action\":\"toggle\",\"output\":[11]}",                              //IN0
-        "{\"action\":\"toggle\",\"output\":[3]}",                               //IN1
-        "{\"action\":\"toggle\",\"output\":[78]}",                              //A5
-        "{\"action\":\"toggle\",\"output\":[6]}",                               //A8
-        "{\"action\":\"toggle\",\"output\":[2]}",                               //A9
-        "{\"action\":\"toggle\",\"output\":[5]}",                               //A10
-        "{\"action\":\"toggle\",\"output\":[7]}",                               //A11
-        "{\"action\":\"toggle\",\"output\":[7]}",                               //A12
-        "{\"action\":\"toggle\",\"output\":[13, 44]}",                          //A13
-        "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[0, 1, 2, 3, 4]}",   //A14
-        "{\"action\":\"toggle\",\"output\":[45]}",                              //A15
-        "{\"action\":\"toggle\",\"output\":[3]}",                               //I16
-        "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[0, 1, 2, 3, 4]}", //I17
-        "{\"action\":\"toggle\",\"output\":[12]}"                               //I18
+        "{\"action\":\"toggle\",\"output\":[11]}",                                 //IN0
+        "{\"action\":\"toggle\",\"output\":[3]}",                                  //IN1
+        "{\"action\":\"toggle\",\"output\":[78]}",                                 //A5
+        "{\"action\":\"toggle\",\"output\":[6]}",                                  //A8
+        "{\"action\":\"toggle\",\"output\":[2]}",                                  //A9
+        "{\"action\":\"toggle\",\"output\":[5]}",                                  //A10
+        "{\"action\":\"toggle\",\"output\":[7]}",                                  //A11
+        "{\"action\":\"toggle\",\"output\":[7]}",                                  //A12
+        "{\"action\":\"toggle\",\"output\":[13, 44]}",                             //A13
+        "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[0, 1, 2, 3, 4, 5]}",   //A14
+        "{\"action\":\"toggle\",\"output\":[45]}",                                 //A15
+        "{\"action\":\"toggle\",\"output\":[3]}",                                  //I16
+        "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[0, 1, 2, 3, 4, 5]}", //I17
+        "{\"action\":\"toggle\",\"output\":[12]}"                                  //I18
     }};
 
 // ---------------------------------------------------------------------------------
@@ -171,10 +171,9 @@ const int OUTPUT_DEF_ARRAY[] = {
 unsigned int controllPin = 0;
 unsigned int directionPin = 0;
 
-const int BLINDS_TOTAL = 5;
+const int BLINDS_TOTAL = 6;
 const int BLINDS[BLINDS_TOTAL] = {
-    CONTROLLINO_R2, CONTROLLINO_R4, CONTROLLINO_R6, CONTROLLINO_R8, CONTROLLINO_R10 //, CONTROLLINO_R12
-};
+    CONTROLLINO_R2, CONTROLLINO_R4, CONTROLLINO_R6, CONTROLLINO_R8, CONTROLLINO_R10, CONTROLLINO_R12};
 
 const byte eepromOffset = 0;
 const unsigned long upCourseTime = 68 * 1000L;
@@ -190,7 +189,6 @@ Shutters kuchyna;
 Shutters obyvacka;
 // the order of the blinds needs to be the same as in the BLINDS[] array above
 Shutters *blindsArray[BLINDS_TOTAL] = {
-    &spalna, &chodba, &detska1, &detska2, &kuchyna //, &obyvacka
-};
+    &spalna, &chodba, &detska1, &detska2, &kuchyna, &obyvacka};
 
 #endif
