@@ -122,20 +122,20 @@ const char *PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
         "ACM0"  //I18
     },
     {
-        "{\"action\":\"toggle\",\"output\":[11]}",                              //IN0
-        "{\"action\":\"toggle\",\"output\":[3]}",                               //IN1
-        "{\"action\":\"toggle\",\"output\":[78]}",                              //A5
-        "{\"action\":\"toggle\",\"output\":[6]}",                               //A8
-        "{\"action\":\"toggle\",\"output\":[2]}",                               //A9
-        "{\"action\":\"toggle\",\"output\":[5]}",                               //A10
-        "{\"action\":\"toggle\",\"output\":[7]}",                               //A11
-        "{\"action\":\"toggle\",\"output\":[7]}",                               //A12
-        "{\"action\":\"toggle\",\"output\":[13, 44]}",                          //A13
-        "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[0, 1, 2, 3, 4]}",   //A14
-        "{\"action\":\"toggle\",\"output\":[45]}",                              //A15
-        "{\"action\":\"toggle\",\"output\":[3]}",                               //I16
-        "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[0, 1, 2, 3, 4]}", //I17
-        "{\"action\":\"toggle\",\"output\":[12]}"                               //I18
+        "{\"action\":\"toggle\",\"output\":[11]}",                                 //IN0
+        "{\"action\":\"toggle\",\"output\":[3]}",                                  //IN1
+        "{\"action\":\"toggle\",\"output\":[78]}",                                 //A5
+        "{\"action\":\"toggle\",\"output\":[6]}",                                  //A8
+        "{\"action\":\"toggle\",\"output\":[2]}",                                  //A9
+        "{\"action\":\"toggle\",\"output\":[5]}",                                  //A10
+        "{\"action\":\"toggle\",\"output\":[7]}",                                  //A11
+        "{\"action\":\"toggle\",\"output\":[7]}",                                  //A12
+        "{\"action\":\"toggle\",\"output\":[13, 44]}",                             //A13
+        "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[0, 1, 2, 3, 4, 5]}",   //A14
+        "{\"action\":\"toggle\",\"output\":[45]}",                                 //A15
+        "{\"action\":\"toggle\",\"output\":[3]}",                                  //I16
+        "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[0, 1, 2, 3, 4, 5]}", //I17
+        "{\"action\":\"toggle\",\"output\":[12]}"                                  //I18
     }};
 
 // ---------------------------------------------------------------------------------
