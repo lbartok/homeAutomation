@@ -18,9 +18,6 @@
 // settings for individual home
 #include <SettingsRez.h>
 
-
-
-
 EthernetClient ethClient;
 PubSubClient client(ethClient);
 long lastReconnectAttempt = 0;
@@ -38,14 +35,18 @@ int getShutterIndex(Shutters* s) {
 */
 
 // Function to correctly return Shutter based on position in the array
-Shutters* resolveShutter(int index) {
-  return blindsArray[index];
+Shutters *resolveShutter(int index)
+{
+    return blindsArray[index];
 }
 
 // Main function handling operation of each shutter
-void shuttersOperationHandler(Shutters* s, ShuttersOperation operation) {
-    for (int s0 = 0; s0 < BLINDS_TOTAL; s0++) {
-        if (s == resolveShutter(s0)) {
+void shuttersOperationHandler(Shutters *s, ShuttersOperation operation)
+{
+    for (int s0 = 0; s0 < BLINDS_TOTAL; s0++)
+    {
+        if (s == resolveShutter(s0))
+        {
             // this callback was called from the blindsArray[s0]
             controllPin = BLINDS[s0];
             directionPin = controllPin + 1;
@@ -53,50 +54,56 @@ void shuttersOperationHandler(Shutters* s, ShuttersOperation operation) {
         }
     }
 
-    switch (operation) {
-        case ShuttersOperation::UP:
-            Serial.println("Shutters going up.");
-            // Code for the shutters to go up
-            digitalWrite(directionPin, LOW);
-            digitalWrite(controllPin, HIGH);
-            break;
-        case ShuttersOperation::DOWN:
-            Serial.println("Shutters going down.");
-            // Code for the shutters to go down
-            digitalWrite(directionPin, HIGH);
-            digitalWrite(controllPin, HIGH);
-            break;
-        case ShuttersOperation::HALT:
-            Serial.println("Shutters halting.");
-            // Code for the shutters to halt
-            digitalWrite(directionPin, LOW);
-            digitalWrite(controllPin, LOW);
-            break;
+    switch (operation)
+    {
+    case ShuttersOperation::UP:
+        //// Serial.println("Shutters going up.");
+        // Code for the shutters to go up
+        digitalWrite(directionPin, LOW);
+        digitalWrite(controllPin, HIGH);
+        break;
+    case ShuttersOperation::DOWN:
+        //// Serial.println("Shutters going down.");
+        // Code for the shutters to go down
+        digitalWrite(directionPin, HIGH);
+        digitalWrite(controllPin, HIGH);
+        break;
+    case ShuttersOperation::HALT:
+        //// Serial.println("Shutters halting.");
+        // Code for the shutters to halt
+        digitalWrite(directionPin, LOW);
+        digitalWrite(controllPin, LOW);
+        break;
     }
 }
 
 // Function to read shutters level from EEPROM
-void readInEeprom(char* dest, byte length) {
-  for (byte i = 0; i < length; i++) {
-    dest[i] = EEPROM.read(eepromOffset + i);
-  }
+void readInEeprom(char *dest, byte length)
+{
+    for (byte i = 0; i < length; i++)
+    {
+        dest[i] = EEPROM.read(eepromOffset + i);
+    }
 }
 
 // Function to store shutters level in EEPROM
-void shuttersWriteStateHandler(Shutters* shutters, const char* state, byte length) {
-  for (byte i = 0; i < length; i++) {
-    EEPROM.write(eepromOffset + i, state[i]);
-    #ifdef ESP8266
-    EEPROM.commit();
-    #endif
-  }
+void shuttersWriteStateHandler(Shutters *shutters, const char *state, byte length)
+{
+    for (byte i = 0; i < length; i++)
+    {
+        EEPROM.write(eepromOffset + i, state[i]);
+#ifdef ESP8266
+        EEPROM.commit();
+#endif
+    }
 }
 
 // Shutters level reached code to announce each whole percent
-void onShuttersLevelReached(Shutters* shutters, byte level) {
-  Serial.print("Shutters at ");
-  Serial.print(level);
-  Serial.println("%.");
+void onShuttersLevelReached(Shutters *shutters, byte level)
+{
+    //// Serial.print("Shutters at ");
+    //// Serial.print(level);
+    //// Serial.println("%.");
 }
 /* New shutter code end */
 
@@ -107,13 +114,14 @@ void toggle(int pin)
 }
 
 // MQTT callback
-void callback(char *topic, byte *payload, unsigned int length) {
+void callback(char *topic, byte *payload, unsigned int length)
+{
 
     const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 30;
     DynamicJsonDocument root(capacity);
     deserializeJson(root, payload);
 
-    const char* action = root["action"];
+    const char *action = root["action"];
     if (strcmp(action, "toggle") == 0)
     {
         for (unsigned int i = 0; i < root["output"].size(); i++)
@@ -122,9 +130,9 @@ void callback(char *topic, byte *payload, unsigned int length) {
             if (button != 0)
             {
                 toggle(button);
-                Serial.print(button);
-                Serial.print("--");
-                Serial.println(digitalRead(button));
+                //// Serial.print(button);
+                //// Serial.print("--");
+                //// Serial.println(digitalRead(button));
             }
         }
     }
@@ -136,23 +144,27 @@ void callback(char *topic, byte *payload, unsigned int length) {
         {
             // set the blind to work with
             int blind = root["output"][y];
-            Shutters* shutB = resolveShutter(blind);
-            
+            Shutters *shutB = resolveShutter(blind);
+
             // prcnt should be between 0 (all the way up) and 100 (all the way down)
             uint8_t percentage = uint8_t(root["prcnt"]);
             // safeguard for overweighting prcnt value
-            if (percentage > 100) {
+            if (percentage > 100)
+            {
                 percentage = 100;
-            } else if (percentage < 0) {
+            }
+            else if (percentage < 0)
+            {
                 percentage = 0;
             }
 
             // check whether the blind is running when button has been pressed again
-            if ((*shutB).isIdle() != true && (percentage == 0 || percentage == 100)) {
+            if ((*shutB).isIdle() != true && (percentage == 0 || percentage == 100))
+            {
                 (*shutB).stop();
 
                 // to be removed when all working
-                Serial.println("Sensed button pressed again hence stopping blind.");
+                //// Serial.println("Sensed button pressed again hence stopping blind.");
                 // end (to be removed)
                 break;
             };
@@ -168,7 +180,8 @@ void callback(char *topic, byte *payload, unsigned int length) {
     }
 }
 
-boolean reconnect() {
+boolean reconnect()
+{
     // Serial.println("Attempting deviceACM1 - MQTT connection ...");
     if (client.connect("deviceACM1"))
     {
@@ -198,43 +211,43 @@ void checkPressedButton(Button &btn)
             client.publish(PUSH_BUTTONS_ACT[0][p], PUSH_BUTTONS_ACT[1][p]);
             client.subscribe("ACM1");
 
-            Serial.println("PushButton from array pressed.");
+            ////Serial.println("PushButton from array pressed.");
         }
     }
 }
-
 
 void setup()
 {
     // begin serial so we can see which buttons are being pressed through the serial monitor
     Serial.begin(9600);
-    
+
     /* New shutters code */
     delay(100);
-    #ifdef ESP8266
+#ifdef ESP8266
     EEPROM.begin(512);
-    #endif
+#endif
     /* New shutters code end */
 
     Serial.println("Init");
-    
+
     // create MQTT
     client.setServer(server, 1883);
     client.setCallback(callback);
 
     client.subscribe("ACM1");
 
-    // Setup ethernet 
+    // Setup ethernet
     Ethernet.begin(mac, ip);
     delay(200);
     lastReconnectAttempt = 0;
 
     /* New shutters code */
-    
+
     // Initialize shutters
-    for (int s1 = 0; s1 < BLINDS_TOTAL; s1++) {
+    for (int s1 = 0; s1 < BLINDS_TOTAL; s1++)
+    {
         // set the shutter to work with
-        Shutters* shut1 = resolveShutter(s1);
+        Shutters *shut1 = resolveShutter(s1);
 
         // get the last stored state of the shutter
         char storedShuttersState[(*shut1).getStateLength()];
@@ -263,20 +276,21 @@ void setup()
     {
         PUSH_BUTTONS_DEF[p2].onPress(checkPressedButton);
     }
-    
+
     // initialize pinMode for blinds
-    for (int pM = 0; pM < BLINDS_TOTAL; pM++) {
+    for (int pM = 0; pM < BLINDS_TOTAL; pM++)
+    {
         pinMode(BLINDS[pM], OUTPUT);
         pinMode(BLINDS[pM] + 1, OUTPUT);
     }
 }
 
-
 void loop()
 {
     // rolety / blinds - New shutters code
-    for (int s2 = 0; s2 < BLINDS_TOTAL; s2++) {
-        Shutters* shut2 = resolveShutter(s2);
+    for (int s2 = 0; s2 < BLINDS_TOTAL; s2++)
+    {
+        Shutters *shut2 = resolveShutter(s2);
         (*shut2).loop();
     }
 
@@ -285,24 +299,25 @@ void loop()
     {
         PUSH_BUTTONS_DEF[p3].update();
     }
-    
+
     // Analog buttons
     buttonsA6.update();
     buttonsA7.update();
-    
+
     // Check if analog button is pressed
     for (int aB2 = 0; aB2 < ANALOG_BUTTONS_TOTAL; aB2++)
     {
         AnalogMultiButton AMBobject = *ANALOG_BUTTONS_DEF[aB2];
         // cycle through all possible buttons
-        for (int aB = 0; aB < BUTTONS_TOTAL; aB++) {
-            if (AMBobject.onPress(aB)) {
+        for (int aB = 0; aB < BUTTONS_TOTAL; aB++)
+        {
+            if (AMBobject.onPress(aB))
+            {
                 client.publish(ANALOG_BUTTONS_ACT[0][aB2][aB], ANALOG_BUTTONS_ACT[1][aB2][aB]);
                 client.subscribe("ACM1");
             }
         }
     }
-
 
     // MQTT connect & reconnect
     if (!client.connected())
@@ -324,9 +339,6 @@ void loop()
         client.loop();
     }
 }
-
-
-
 
 // duration reports back how long it has been since the button was originally pressed.
 // repeatCount tells us how many times this function has been called by this button.

@@ -40,7 +40,7 @@ const int ANALOG_BUTTONS_TOTAL = 2;
 const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
     {//section for topic to which we post MQTT message
      {
-         //A6
+         //A6 jedalen
          "",     //Button 0
          "ACM0", //Button 1
          "ACM0", //Button 2
@@ -50,7 +50,7 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
          "ACM0"  //Button 6
      },
      {
-         //A7
+         //A7 obyvacka
          "",     //Button 0
          "ACM0", //Button 1
          "ACM0", //Button 2
@@ -61,7 +61,7 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
      }},
     {//section for actual message to post in MQTT
      {
-         //A6
+         //A6 jedalen
          "",                                                         //Button 0
          "{\"action\":\"toggle\",\"output\":[9]}",                   //Button 1
          "{\"action\":\"toggle\",\"output\":[10]}",                  //Button 2
@@ -71,12 +71,12 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
          "{\"action\":\"toggle\",\"output\":[8]}"                    //Button 6
      },
      {
-         //A7
+         //A7 obyvacka
          "",                                                         //Button 0
          "{\"action\":\"toggle\",\"output\":[13, 44]}",              //Button 1
          "{\"action\":\"toggle\",\"output\":[12]}",                  //Button 2
-         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[4]}", //Button 3
-         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[4]}",   //Button 4
+         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[5]}", //Button 3
+         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[5]}",   //Button 4
          "{\"action\":\"toggle\",\"output\":[80]}",                  //Button 5
          "{\"action\":\"toggle\",\"output\":[8, 9]}"                 //Button 6
      }}};

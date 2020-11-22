@@ -14,9 +14,6 @@
 // settings for individual home
 #include <SettingsRez.h>
 
-
-
-
 EthernetClient ethClient;
 PubSubClient client(ethClient);
 long lastReconnectAttempt = 0;
@@ -28,23 +25,25 @@ void toggle(int pin)
 }
 
 // MQTT callback
-void callback(char *topic, byte *payload, unsigned int length) {
+void callback(char *topic, byte *payload, unsigned int length)
+{
 
     const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 30;
     DynamicJsonDocument root(capacity);
     deserializeJson(root, payload);
 
-    const char* action = root["action"];
+    const char *action = root["action"];
     if (strcmp(action, "toggle") == 0)
     {
         for (unsigned int i = 0; i < root["output"].size(); i++)
         {
-            const int button =  root["output"][i];
-            if(button != 0 ) {
+            const int button = root["output"][i];
+            if (button != 0)
+            {
                 toggle(button);
-                Serial.print(button);
-                Serial.print("--");
-                Serial.println(digitalRead(button));
+                //// Serial.print(button);
+                //// Serial.print("--");
+                //// Serial.println(digitalRead(button));
             }
         }
     }
@@ -55,7 +54,8 @@ void callback(char *topic, byte *payload, unsigned int length) {
     }
 }
 
-boolean reconnect() {
+boolean reconnect()
+{
     // Serial.println("Attempting deviceACM1 - MQTT connection ...");
     if (client.connect("deviceACM0"))
     {
@@ -88,9 +88,6 @@ void checkPressedPushButton(Button &btn)
     }
 }
 
-
-
-
 void setup()
 {
     // begin serial so we can see which buttons are being pressed through the serial monitor
@@ -103,7 +100,7 @@ void setup()
 
     client.subscribe("ACM0");
 
-    // Setup ethernet 
+    // Setup ethernet
     Ethernet.begin(mac, ip);
     delay(200);
     lastReconnectAttempt = 0;
@@ -120,9 +117,6 @@ void setup()
         PUSH_BUTTONS_DEF[p2].onPress(checkPressedPushButton);
     }
 }
-
-
-
 
 void loop()
 {
@@ -142,21 +136,23 @@ void loop()
     buttonsA15.update();
 
     // Check if button is pressed
-    for (int aBarray = 0; aBarray < ANALOG_BUTTONS_TOTAL; aBarray++) {
+    for (int aBarray = 0; aBarray < ANALOG_BUTTONS_TOTAL; aBarray++)
+    {
         // dereference analog multi button reference
         AnalogMultiButton *p0 = ANALOG_BUTTONS_DEF[aBarray];
         AnalogMultiButton deRefObject = *p0;
         // cycle through all possible buttons
-        for (int aB = 0; aB < BUTTONS_TOTAL; aB++) {
-            if (deRefObject.onPress(aB)) {
+        for (int aB = 0; aB < BUTTONS_TOTAL; aB++)
+        {
+            if (deRefObject.onPress(aB))
+            {
                 client.publish(ANALOG_BUTTONS_ACT[0][aBarray][aB], ANALOG_BUTTONS_ACT[1][aBarray][aB]);
-                client.subscribe("ACM0");          
+                client.subscribe("ACM0");
             }
         }
     }
 
- 
- // MQTT connect & reconnect
+    // MQTT connect & reconnect
     if (!client.connected())
     {
         long now = millis();
@@ -176,9 +172,6 @@ void loop()
         client.loop();
     }
 }
-
-
-
 
 // duration reports back how long it has been since the button was originally pressed.
 // repeatCount tells us how many times this function has been called by this button.
