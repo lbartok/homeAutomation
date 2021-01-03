@@ -110,11 +110,11 @@ const char *PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
         "ACM0", //IN1
         "ACM0", //A5
         "ACM0", //A8
-        "ACM0", //A9
-        "ACM0", //A10
-        "ACM0", //A11
-        "ACM0", //A12
-        "ACM0", //A13
+        "ACM0", //A9  Kupelna dole
+        "ACM0", //A10 Kupelna dole
+        "ACM0", //A11 Kuchyna linka
+        "ACM0", //A12 Kuchyna linka
+        "ACM0", //A13 Chodba schody
         "ACM1", //A14
         "ACM0", //A15
         "ACM1", //I16
@@ -128,8 +128,8 @@ const char *PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
         "{\"action\":\"toggle\",\"output\":[6]}",                                  //A8
         "{\"action\":\"toggle\",\"output\":[2]}",                                  //A9
         "{\"action\":\"toggle\",\"output\":[5]}",                                  //A10
-        "{\"action\":\"toggle\",\"output\":[7]}",                                  //A11
-        "{\"action\":\"toggle\",\"output\":[7]}",                                  //A12
+        "{\"action\":\"toggle\",\"output\":[8, 9]}",                               //A11
+        "{\"action\":\"toggle\",\"output\":[8, 9]}",                               //A12
         "{\"action\":\"toggle\",\"output\":[13, 44]}",                             //A13
         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[0, 1, 2, 3, 4, 5]}",   //A14
         "{\"action\":\"toggle\",\"output\":[45]}",                                 //A15

@@ -57,19 +57,19 @@ void shuttersOperationHandler(Shutters *s, ShuttersOperation operation)
     switch (operation)
     {
     case ShuttersOperation::UP:
-        //// Serial.println("Shutters going up.");
+        Serial.println("Shutters going up.");
         // Code for the shutters to go up
         digitalWrite(directionPin, LOW);
         digitalWrite(controllPin, HIGH);
         break;
     case ShuttersOperation::DOWN:
-        //// Serial.println("Shutters going down.");
+        Serial.println("Shutters going down.");
         // Code for the shutters to go down
         digitalWrite(directionPin, HIGH);
         digitalWrite(controllPin, HIGH);
         break;
     case ShuttersOperation::HALT:
-        //// Serial.println("Shutters halting.");
+        Serial.println("Shutters halting.");
         // Code for the shutters to halt
         digitalWrite(directionPin, LOW);
         digitalWrite(controllPin, LOW);
