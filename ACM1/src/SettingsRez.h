@@ -64,11 +64,11 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
          //A6 jedalen
          "",                                                         //Button 0
          "{\"action\":\"toggle\",\"output\":[9]}",                   //Button 1
-         "{\"action\":\"toggle\",\"output\":[10]}",                  //Button 2
-         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[4]}", //Button 3
-         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[4]}",   //Button 4
+         "{\"action\":\"toggle\",\"output\":[8]}",                   //Button 2
+         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[4]}",   //Button 3
+         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[4]}", //Button 4
          "{\"action\":\"toggle\",\"output\":[12]}",                  //Button 5
-         "{\"action\":\"toggle\",\"output\":[8]}"                    //Button 6
+         "{\"action\":\"toggle\",\"output\":[10]}"                   //Button 6
      },
      {
          //A7 obyvacka
@@ -115,27 +115,27 @@ const char *PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
         "ACM0", //A11 Kuchyna linka
         "ACM0", //A12 Kuchyna linka
         "ACM0", //A13 Chodba schody
-        "ACM1", //A14
+        "ACM0", //A14
         "ACM0", //A15
-        "ACM1", //I16
+        "ACM0", //I16
         "ACM1", //I17
         "ACM0"  //I18
     },
     {
-        "{\"action\":\"toggle\",\"output\":[11]}",                                 //IN0
-        "{\"action\":\"toggle\",\"output\":[3]}",                                  //IN1
-        "{\"action\":\"toggle\",\"output\":[78]}",                                 //A5
-        "{\"action\":\"toggle\",\"output\":[6]}",                                  //A8
-        "{\"action\":\"toggle\",\"output\":[2]}",                                  //A9
-        "{\"action\":\"toggle\",\"output\":[5]}",                                  //A10
-        "{\"action\":\"toggle\",\"output\":[8, 9]}",                               //A11
-        "{\"action\":\"toggle\",\"output\":[8, 9]}",                               //A12
-        "{\"action\":\"toggle\",\"output\":[13, 44]}",                             //A13
-        "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[0, 1, 2, 3, 4, 5]}",   //A14
-        "{\"action\":\"toggle\",\"output\":[45]}",                                 //A15
-        "{\"action\":\"toggle\",\"output\":[3]}",                                  //I16
-        "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[0, 1, 2, 3, 4, 5]}", //I17
-        "{\"action\":\"toggle\",\"output\":[12]}"                                  //I18
+        "{\"action\":\"toggle\",\"output\":[11]}",   //IN0
+        "{\"action\":\"toggle\",\"output\":[3]}",    //IN1
+        "{\"action\":\"toggle\",\"output\":[78]}",   //A5
+        "{\"action\":\"toggle\",\"output\":[6]}",    //A8
+        "{\"action\":\"toggle\",\"output\":[2]}",    //A9
+        "{\"action\":\"toggle\",\"output\":[5]}",    //A10
+        "{\"action\":\"toggle\",\"output\":[8, 9]}", //A11
+        "{\"action\":\"toggle\",\"output\":[8, 9]}", //A12
+        "{\"action\":\"toggle\",\"output\":[49]}",   //A13 f
+        "{\"action\":\"toggle\",\"output\":[45]}",   //A14 c
+        "{\"action\":\"toggle\",\"output\":[46]}",   //A15 a
+        "{\"action\":\"toggle\",\"output\":[47]}",   //I16 b
+        "{\"action\":\"toggle\",\"output\":[3]}",    //I17 d
+        "{\"action\":\"toggle\",\"output\":[48]}"    //I18 e
     }};
 
 // ---------------------------------------------------------------------------------
