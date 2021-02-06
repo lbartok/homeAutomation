@@ -65,11 +65,11 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
          //A6
          "",                                                         //Button 0
          "{\"action\":\"toggle\",\"output\":[9]}",                   //Button 1
-         "{\"action\":\"toggle\",\"output\":[10]}",                  //Button 2
-         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[4]}", //Button 3
-         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[4]}",   //Button 4
+         "{\"action\":\"toggle\",\"output\":[8]}",                   //Button 2
+         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[4]}",   //Button 3
+         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[4]}", //Button 4
          "{\"action\":\"toggle\",\"output\":[12]}",                  //Button 5
-         "{\"action\":\"toggle\",\"output\":[8]}"                    //Button 6
+         "{\"action\":\"toggle\",\"output\":[10]}"                   //Button 6
      },
      {
          //A7
