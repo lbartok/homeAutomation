@@ -106,13 +106,13 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
      },
      {
          //A15
-         "",     //Button 0
-         "ACM0", //Button 1
-         "ACM0", //Button 2
-         "ACM0", //Button 3
-         "ACM0", //Button 4
-         "ACM0", //Button 5
-         "ACM0"  //Button 6
+         "",                                   //Button 0
+         "ACM0/light/kitchen/island",          //Button 1
+         "ACM0/light/kitchen/dining",          //Button 2
+         "ACM0/light/hallway/downstairs/main", //Button 3
+         "ACM0/light/kitchen/fridge",          //Button 4
+         "ACM0",                               //Button 5
+         "ACM0"                                //Button 6
      }},
     {//section for actual message to post in MQTT
      {
@@ -178,10 +178,10 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
      {
          //A15
          "",                                        //Button 0
-         "{\"action\":\"toggle\",\"output\":[9]}",  //Button 1
-         "{\"action\":\"toggle\",\"output\":[10]}", //Button 2
-         "{\"action\":\"toggle\",\"output\":[12]}", //Button 3
-         "{\"action\":\"toggle\",\"output\":[8]}",  //Button 4
+         "on",                                      //Button 1
+         "on",                                      //Button 2
+         "on",                                      //Button 3
+         "on",                                      //Button 4
          "{\"action\":\"toggle\",\"output\":[78]}", //Button 5
          "{\"action\":\"toggle\",\"output\":[79]}"  //Button 6
      }}};
@@ -225,8 +225,9 @@ const char *PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
 // ---------------------------------------------------------------------------------
 
 // outputs definition array for being able to read the state through function
+// TODO: Need to rewrite this to struct array of int and string
 const int TOTAL_OUTPUT_DEF_ARRAY = 24;
-const int OUTPUT_DEF_ARRAY[] = {
+const int OUTPUT_DEF_ARRAY[TOTAL_OUTPUT_DEF_ARRAY] = {
     CONTROLLINO_D0,
     CONTROLLINO_D1,
     CONTROLLINO_D2,
@@ -252,4 +253,30 @@ const int OUTPUT_DEF_ARRAY[] = {
     CONTROLLINO_D22,
     CONTROLLINO_D23};
 
+const int TOTAL_ENTITY_DEF_ARRAY = 24;
+const char *ENTITY_DEF_ARRAY[TOTAL_ENTITY_DEF_ARRAY] = {
+    "/light/bathroom/downstairs/mirror",
+    "/light/tech_room",
+    "/light/hallway/downstairs/entrance",
+    "ACM0/light/bathroom/downstairs/main",
+    "/light/pantry",
+    "/light/kitchen/led",
+    "ACM0/light/kitchen/fridge",
+    "ACM0/light/kitchen/island",
+    "ACM0/light/kitchen/dining",
+    "/light/guest_room",
+    "ACM0/light/hallway/downstairs/main",
+    "/light/living_room/hallway",
+    "/light/living_room/led/ceiling",
+    "/light/hallway/stairs/led",
+    "/light/living_room/led/tv",
+    "/light/living_room/center",
+    "/light/living_room/1",
+    "/light/living_room/2",
+    "/light/living_room/3",
+    "/light/living_room/4",
+    "/light/living_room/5",
+    "/light/outside/door",
+    "/light/outside/garage",
+    "/light/outside/porch"};
 #endif
