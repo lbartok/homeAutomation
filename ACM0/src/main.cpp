@@ -24,125 +24,121 @@ void toggle(int pin)
     digitalWrite(pin, !digitalRead(pin));
 }
 
-// Find which output to choose for the topic received
+// Helper function to find which output to choose for the topic received
 // TODO: need to rewrite this to struct array of int and string
-int returnPin(const char *recEntity)
+int returnPin(String recEntity)
 {
     for (unsigned int i = 0; i < TOTAL_ENTITY_DEF_ARRAY; i++)
     {
-        if (strcmp(recEntity, ENTITY_DEF_ARRAY[i]) == 0)
+        if (recEntity.compareTo(ENTITY_DEF_ARRAY[i]) == 0)
         {
             return OUTPUT_DEF_ARRAY[i];
         };
     };
 
-    return 65535;
+    return -1;
 }
 
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length)
 {
     // TODO: new way of handling topic(s) from HASS (ACM0/light/kitchen/island)
-    // ! it still does not work, although commented out turns the lights on, but gets stuck...
-    // ! we are still missing the way to handle toggle by the switch, so this needs to be rethought... :(
-    // Split the topic into digestable fractions (ACM0/light/kitchen/island)
+    // ! we are still missing the way to handle blinds, so this needs to be enhanced...
 
-    //Serial.println(sscanf(recTopic, "%s/%s/%s", arduino, entityType, entity));
-    /*
-    char *topicBuffer[10], *token;
-    char *recTopic = NULL;
-    strcpy(recTopic, (const char *)topic);
-    char *saveptr1;
-    int j;
-    for (j = 0; ; j++, recTopic = NULL)
-    {
-        token = strtok_r(recTopic, "/", &saveptr1);
-        if (token == NULL)
-            break;
-        topicBuffer[j] = token;
-        Serial.println(topicBuffer[j]);
-    }
-    char *arduino = topicBuffer[0];
-    char *entityType = topicBuffer[1];
-    char *entity = topicBuffer[2];
-    /*
-    for (unsigned int x = 3; x < 10; x++)
-    {
-        Serial.println(topicBuffer[x]);
-        if (topicBuffer[x] == NULL)
-            break;
-        strcat(entity, "/");
-        strcat(entity, topicBuffer[x]);
-    }
+    // Convert the payload and topic (ACM0/light/kitchen/island) to workable strings
+    //! to be removed when done
+    Serial.print("Message arrived on topic: ");
+    Serial.print(topic);
+    Serial.print(". Message: ");
 
-    Serial.print("Received message for topic: ");
-    Serial.print(arduino);
-    Serial.print(" - ");
-    Serial.print(entityType);
-    Serial.print(" - ");
-    Serial.println(entity);
-
-    // Construct entity and state topic for the received entity
-    char *stateTopic = topic;
-*/
-    char *concatEntity = topic;
-    //strcpy(concatEntity, entityType);
-    //strcat(concatEntity, "/");
-    //strcat(concatEntity, entity);
-    /*    strcpy(stateTopic, (const char *)topic);
-    strcat(stateTopic, "/state");
-
-    Serial.print("state topic: ");
-    Serial.println(stateTopic);
-    Serial.println(topic);
-*/
-    // Construct entity for pin checkout
-    //char *concatEntity = 0;
-    //Serial.println(sprintf(concatEntity, "%s/%s", entityType, entity));
-
-    Serial.print("concatenated topic: ");
-    Serial.println(concatEntity);
-
-    // Define incoming message
-
-    char message_buff[100];
+    String message, topicStr, stateTopicTemp;
 
     for (unsigned int i = 0; i < length; i++)
     {
-        message_buff[i] = payload[i];
+        Serial.print((char)payload[i]);
+        message += (char)payload[i];
     }
-    message_buff[length] = '\0';
+    //! to be removed when done
+    Serial.println();
 
-    char *message = (char *)(message_buff);
-
-    //to be removed
-    Serial.print("message: ");
-    Serial.println(message);
-    //end of to be removed
-
-    // Check the type to know what to do (light/outlet/blind)
-    //if (strcmp(entityType, "light") == 0 || strcmp(entityType, "outlet") == 0)
-    //{
-    // Get the pin by the entity
-    int foundPin = returnPin(concatEntity);
-    Serial.print("PIN Found: ");
-    Serial.println(foundPin);
-    if (strcmp(message, "on") == 0 && digitalRead(foundPin) == LOW)
+    // Construct state topic for publishing state back to hassio
+    // Preserve topic as a String for future checks 
+    topicStr.concat(topic);
+    // Prepare temp topic to convert later to const char * for publishing
+    stateTopicTemp.concat(topic);
+    // Modify the received topic for reporting state
+    if (topicStr.indexOf("cmd") >= 0)
     {
-        toggle(foundPin);
-        client.publish(topic, "on");
+        stateTopicTemp.replace("cmd", "state");
     }
-    else if (strcmp(message, "off") == 0 && digitalRead(foundPin) == HIGH)
+    else if (topicStr.indexOf("toggle") >= 0)
     {
-        toggle(foundPin);
-        client.publish(topic, "off");
+        stateTopicTemp.replace("toggle", "state");
     }
     else
     {
-        client.publish(topic, digitalRead(foundPin) == HIGH ? "on" : "off");
+        Serial.println("Topic is unknown command!");
     }
-    //};
+    const char *stateTopic = stateTopicTemp.c_str();
 
+    //! to be removed when done
+    Serial.print("State topic: ");
+    Serial.println(stateTopic);
+    Serial.println("Topic is still the same? > ");
+    Serial.println(topicStr + " vs " + topic);
+
+    // Check the type to know what to do (cmd = hassio | toggle = switch)
+    if (topicStr.lastIndexOf("cmd") >= 0)
+    {
+        // Check the type to know what to do (light/outlet/blind)
+        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
+        {
+            // Get the pin by the entity
+            int foundPin = returnPin(topicStr.substring(5, topicStr.length()-String("/cmd").length()));
+            //! to be removed when done
+            Serial.print("PIN Found: ");
+            Serial.println(foundPin);
+
+            // Check if request is to turn on and currently is off
+            if (message.compareTo("on") == 0 && digitalRead(foundPin) == LOW)
+            {
+                // Switch the state and publish
+                toggle(foundPin);
+                client.publish(stateTopic, "on");
+            }
+            // Check if request it to turn off and currently is on
+            else if (message.compareTo("off") == 0 && digitalRead(foundPin) == HIGH)
+            {
+                // Switch the state and publish
+                toggle(foundPin);
+                client.publish(stateTopic, "off");
+            }
+            else
+            {
+                // When it is already in desired state, just publish back the state
+                client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off");
+            }
+        };
+    }
+
+    // Check the type to know what to do (cmd = hassio | toggle = switch)
+    if (topicStr.lastIndexOf("toggle") >= 0)
+    {
+        // Check the type to know what to do (light/outlet/blind)
+        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
+        {
+            // Get the pin by the entity
+            int foundPin = returnPin(topicStr.substring(5, topicStr.length()-String("/toggle").length()));
+            //! to be removed when done
+            Serial.print("PIN Found: ");
+            Serial.println(foundPin);
+
+            // Toggle the pin value
+            toggle(foundPin);
+            // Publish the state to the state topic
+            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off");
+        };
+    }
     // ! This part can be removed if the above prooves to be working...
     /*
     const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 30;
@@ -229,10 +225,10 @@ void callback(char *topic, byte *payload, unsigned int length)
     }
 */
     //if (strcmp(action, "info") == 0)
-    if (strcmp(topic, "ACM0/info/#") == 0)
+    if (topicStr.indexOf("info") == 0)
     {
         Serial.println("ACM0 reconnected...'info' command received.");
-        client.publish("ACM0/info_done", "0");
+        client.publish("ACM0/info_done", "info accomplished");
     }
 }
 
@@ -243,7 +239,7 @@ boolean reconnect()
     {
         // Once connected, publish an announcement...
         //client.publish("ACM0", "{\"action\":\"info\"}");
-        client.publish("ACM0/info/0", "info on");
+        client.publish("ACM0/info/0", "reconnected");
         // ... and resubscribe
         client.subscribe("ACM0/#");
     }

@@ -41,6 +41,115 @@ AnalogMultiButton buttonsA15(CONTROLLINO_A15, BUTTONS_TOTAL, BUTTONS_VALUES_2);
 AnalogMultiButton *ANALOG_BUTTONS_DEF[] = {
     &buttonsA0, &buttonsA1, &buttonsA2, &buttonsA4, &buttonsA13, &buttonsA14, &buttonsA15};
 const int ANALOG_BUTTONS_TOTAL = 7;
+
+// try and error for a union
+typedef struct SubButton
+{
+    const char *name;
+    const char *topics[6];
+} SubButton;
+
+// a_button[0].name = A0 = input name on the controllino
+// a_button[0].definition > reference to the analogMultiButton object
+// a_button[0].total_buttons > number of buttons associated with multiButton
+// a_button[0].buttons[0].name = s10_5_a > name of the switch and button on it
+// a_button[0].buttons[0].total_topics > number of topics associated with particular button
+// a_button[0].buttons[0].topics[0] = "ACM0/light/#" > topic(s) to turn up
+
+typedef struct AmB
+{
+    String name;
+    AnalogMultiButton *definition;
+    SubButton buttons[BUTTONS_TOTAL];
+} AmB;
+
+AmB am_button[ANALOG_BUTTONS_TOTAL] = {
+    {
+        "A0", &buttonsA0, 
+        {
+            {},
+            {"s13_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_b", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_c", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_d", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_b", {"ACM0/light/", "ACM0/light/"}}
+        }
+    },
+    {
+        "A1", &buttonsA1, 
+        {
+            {},
+            {"s13_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_b", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_c", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_d", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_b", {"ACM0/light/", "ACM0/light/"}}
+        }
+    },
+    {
+        "A2", &buttonsA2, 
+        {
+            {},
+            {"s13_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_b", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_c", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_d", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_b", {"ACM0/light/", "ACM0/light/"}}
+        }
+    },
+    {
+        "A4", &buttonsA4, 
+        {
+            {},
+            {"s13_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_b", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_c", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_d", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_b", {"ACM0/light/", "ACM0/light/"}}
+        }
+    },
+    {
+        "A13", &buttonsA13, 
+        {
+            {},
+            {"s13_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_b", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_c", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_d", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_b", {"ACM0/light/", "ACM0/light/"}}
+        }
+    },
+    {
+        "A14", &buttonsA14, 
+        {
+            {},
+            {"s13_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_b", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_c", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_d", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_b", {"ACM0/light/", "ACM0/light/"}}
+        }
+    },
+    {
+        "A15", &buttonsA15, 
+        {
+            {},
+            {"s13_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_b", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_c", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s13_d", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_a", {"ACM0/light/", "ACM0/light/"}}, 
+            {"s18_b", {"ACM0/light/", "ACM0/light/"}}
+        }
+    }
+};
+//initialize_AmB();
 // analog buttons actor array (needs to be same order as ANALOG_BUTTONS_DEF)
 const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
     {//section for topic to which we post MQTT message
@@ -106,13 +215,13 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
      },
      {
          //A15
-         "",                                   //Button 0
-         "ACM0/light/kitchen/island",          //Button 1
-         "ACM0/light/kitchen/dining",          //Button 2
-         "ACM0/light/hallway/downstairs/main", //Button 3
-         "ACM0/light/kitchen/fridge",          //Button 4
-         "ACM0",                               //Button 5
-         "ACM0"                                //Button 6
+         "",                                          //Button 0
+         "ACM0/light/kitchen/island/cmd",             //Button 1
+         "ACM0/light/kitchen/dining/cmd",             //Button 2
+         "ACM0/light/hallway/downstairs/main/toggle", //Button 3
+         "ACM0/light/kitchen/fridge/toggle",          //Button 4
+         "ACM0",                                      //Button 5
+         "ACM0"                                       //Button 6
      }},
     {//section for actual message to post in MQTT
      {
@@ -180,8 +289,8 @@ const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
          "",                                        //Button 0
          "on",                                      //Button 1
          "on",                                      //Button 2
-         "on",                                      //Button 3
-         "on",                                      //Button 4
+         "toggle",                                  //Button 3
+         "toggle",                                  //Button 4
          "{\"action\":\"toggle\",\"output\":[78]}", //Button 5
          "{\"action\":\"toggle\",\"output\":[79]}"  //Button 6
      }}};
@@ -224,6 +333,39 @@ const char *PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
 // OUTPUT DEFINITION
 // ---------------------------------------------------------------------------------
 
+typedef struct c_output
+{
+    const char *name;
+    int pin;
+    String entity;
+} c_output; 
+
+c_output c_outputs[24] = {{"el_49", CONTROLLINO_D0, "/light/bathroom/downstairs/mirror"},
+                 {"el_51", CONTROLLINO_D1, "/light/tech_room"},
+                 {"el_52", CONTROLLINO_D2, "/light/hallway/downstairs/entrance"},
+                 {"el_53", CONTROLLINO_D3, "/light/bathroom/downstairs/main"},
+                 {"el_54", CONTROLLINO_D4, "/light/pantry"},
+                 {"el_55", CONTROLLINO_D5, "/light/kitchen/led"},
+                 {"el_56", CONTROLLINO_D6, "/light/kitchen/fridge"},
+                 {"el_57", CONTROLLINO_D7, "/light/kitchen/island"},
+                 {"el_58", CONTROLLINO_D8, "/light/kitchen/dining"},
+                 {"el_61", CONTROLLINO_D9, "/light/guest_room"},
+                 {"el_62_63", CONTROLLINO_D10, "/light/hallway/downstairs/main"},
+                 {"el_64", CONTROLLINO_D11, "/light/living_room/hallway"},
+                 {"el_66", CONTROLLINO_D12, "/light/living_room/led/ceiling"},
+                 {"el_68", CONTROLLINO_D15, "/light/hallway/stairs/led"},
+                 {"el_65", CONTROLLINO_D13, "/light/living_room/led/tv"},
+                 {"el_67", CONTROLLINO_D14, "/light/living_room/center"},
+                 {"el_71", CONTROLLINO_D16, "/light/living_room/1"},
+                 {"el_72", CONTROLLINO_D17, "/light/living_room/2"},
+                 {"el_73", CONTROLLINO_D18, "/light/living_room/3"},
+                 {"el_74", CONTROLLINO_D19, "/light/living_room/4"},
+                 {"el_75", CONTROLLINO_D20, "/light/living_room/5"},
+                 {"el_76", CONTROLLINO_D21, "/light/outside/door"},
+                 {"el_77", CONTROLLINO_D22, "/light/outside/garage"},
+                 {"el_78", CONTROLLINO_D23, "/light/outside/porch"}};
+
+
 // outputs definition array for being able to read the state through function
 // TODO: Need to rewrite this to struct array of int and string
 const int TOTAL_OUTPUT_DEF_ARRAY = 24;
@@ -255,28 +397,28 @@ const int OUTPUT_DEF_ARRAY[TOTAL_OUTPUT_DEF_ARRAY] = {
 
 const int TOTAL_ENTITY_DEF_ARRAY = 24;
 const char *ENTITY_DEF_ARRAY[TOTAL_ENTITY_DEF_ARRAY] = {
-    "/light/bathroom/downstairs/mirror",
-    "/light/tech_room",
-    "/light/hallway/downstairs/entrance",
-    "ACM0/light/bathroom/downstairs/main",
-    "/light/pantry",
-    "/light/kitchen/led",
-    "ACM0/light/kitchen/fridge",
-    "ACM0/light/kitchen/island",
-    "ACM0/light/kitchen/dining",
-    "/light/guest_room",
-    "ACM0/light/hallway/downstairs/main",
-    "/light/living_room/hallway",
-    "/light/living_room/led/ceiling",
-    "/light/hallway/stairs/led",
-    "/light/living_room/led/tv",
-    "/light/living_room/center",
-    "/light/living_room/1",
-    "/light/living_room/2",
-    "/light/living_room/3",
-    "/light/living_room/4",
-    "/light/living_room/5",
-    "/light/outside/door",
-    "/light/outside/garage",
-    "/light/outside/porch"};
+    "light/bathroom/downstairs/mirror",
+    "light/tech_room",
+    "light/hallway/downstairs/entrance",
+    "light/bathroom/downstairs/main",
+    "light/pantry",
+    "light/kitchen/led",
+    "light/kitchen/fridge",
+    "light/kitchen/island",
+    "light/kitchen/dining",
+    "light/guest_room",
+    "light/hallway/downstairs/main",
+    "light/living_room/hallway",
+    "light/living_room/led/ceiling",
+    "light/hallway/stairs/led",
+    "light/living_room/led/tv",
+    "light/living_room/center",
+    "light/living_room/1",
+    "light/living_room/2",
+    "light/living_room/3",
+    "light/living_room/4",
+    "light/living_room/5",
+    "light/outside/door",
+    "light/outside/garage",
+    "light/outside/porch"};
 #endif
