@@ -25,14 +25,13 @@ void toggle(int pin)
 }
 
 // Helper function to find which output to choose for the topic received
-// TODO: need to rewrite this to struct array of int and string
 int returnPin(String recEntity)
 {
-    for (unsigned int i = 0; i < TOTAL_ENTITY_DEF_ARRAY; i++)
+    for (unsigned int i = 0; i < OUTPUTS_TOTAL; i++)
     {
-        if (recEntity.compareTo(ENTITY_DEF_ARRAY[i]) == 0)
+        if (recEntity.compareTo(c_outputs[i].entity) == 0)
         {
-            return OUTPUT_DEF_ARRAY[i];
+            return c_outputs[i].pin;
         };
     };
 
@@ -42,27 +41,16 @@ int returnPin(String recEntity)
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length)
 {
-    // TODO: new way of handling topic(s) from HASS (ACM0/light/kitchen/island)
-    // ! we are still missing the way to handle blinds, so this needs to be enhanced...
-
     // Convert the payload and topic (ACM0/light/kitchen/island) to workable strings
-    //! to be removed when done
-    Serial.print("Message arrived on topic: ");
-    Serial.print(topic);
-    Serial.print(". Message: ");
-
     String message, topicStr, stateTopicTemp;
 
     for (unsigned int i = 0; i < length; i++)
     {
-        Serial.print((char)payload[i]);
         message += (char)payload[i];
     }
-    //! to be removed when done
-    Serial.println();
 
     // Construct state topic for publishing state back to hassio
-    // Preserve topic as a String for future checks 
+    // Preserve topic as a String for future checks
     topicStr.concat(topic);
     // Prepare temp topic to convert later to const char * for publishing
     stateTopicTemp.concat(topic);
@@ -77,15 +65,9 @@ void callback(char *topic, byte *payload, unsigned int length)
     }
     else
     {
-        Serial.println("Topic is unknown command!");
+        stateTopicTemp = "Topic is unknown command!";
     }
     const char *stateTopic = stateTopicTemp.c_str();
-
-    //! to be removed when done
-    Serial.print("State topic: ");
-    Serial.println(stateTopic);
-    Serial.println("Topic is still the same? > ");
-    Serial.println(topicStr + " vs " + topic);
 
     // Check the type to know what to do (cmd = hassio | toggle = switch)
     if (topicStr.lastIndexOf("cmd") >= 0)
@@ -94,10 +76,7 @@ void callback(char *topic, byte *payload, unsigned int length)
         if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
         {
             // Get the pin by the entity
-            int foundPin = returnPin(topicStr.substring(5, topicStr.length()-String("/cmd").length()));
-            //! to be removed when done
-            Serial.print("PIN Found: ");
-            Serial.println(foundPin);
+            int foundPin = returnPin(topicStr.substring(5, topicStr.length() - String("/cmd").length()));
 
             // Check if request is to turn on and currently is off
             if (message.compareTo("on") == 0 && digitalRead(foundPin) == LOW)
@@ -105,6 +84,8 @@ void callback(char *topic, byte *payload, unsigned int length)
                 // Switch the state and publish
                 toggle(foundPin);
                 client.publish(stateTopic, "on");
+                // ... and resubscribe
+                client.subscribe(controllino);
             }
             // Check if request it to turn off and currently is on
             else if (message.compareTo("off") == 0 && digitalRead(foundPin) == HIGH)
@@ -112,11 +93,15 @@ void callback(char *topic, byte *payload, unsigned int length)
                 // Switch the state and publish
                 toggle(foundPin);
                 client.publish(stateTopic, "off");
+                // ... and resubscribe
+                client.subscribe(controllino);
             }
             else
             {
                 // When it is already in desired state, just publish back the state
                 client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off");
+                // ... and resubscribe
+                client.subscribe(controllino);
             }
         };
     }
@@ -128,120 +113,34 @@ void callback(char *topic, byte *payload, unsigned int length)
         if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
         {
             // Get the pin by the entity
-            int foundPin = returnPin(topicStr.substring(5, topicStr.length()-String("/toggle").length()));
-            //! to be removed when done
-            Serial.print("PIN Found: ");
-            Serial.println(foundPin);
+            int foundPin = returnPin(topicStr.substring(5, topicStr.length() - String("/toggle").length()));
 
             // Toggle the pin value
             toggle(foundPin);
             // Publish the state to the state topic
             client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off");
+            // ... and resubscribe
+            client.subscribe(controllino);
         };
     }
-    // ! This part can be removed if the above prooves to be working...
-    /*
-    const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 30;
-    DynamicJsonDocument root(capacity);
-    deserializeJson(root, payload);
 
-    const char *action = root["action"];
-    if (strcmp(action, "toggle") == 0)
-    {
-        for (unsigned int i = 0; i < root["output"].size(); i++)
-        {
-            const int button = root["output"][i];
-            if (button != 0)
-            {
-                toggle(button);
-                Serial.print(button);
-                Serial.print("--");
-                Serial.println(digitalRead(button));
-            }
-        }
-    }
-
-    // state handling
-    if (strcmp(action, "state") == 0)
-    {
-        // construct JSON object - state
-        const size_t stateCapacity = JSON_ARRAY_SIZE(30) + JSON_OBJECT_SIZE(2) + 30;
-        DynamicJsonDocument state(stateCapacity);
-
-        // add controllino key
-        state["controllino"] = "ACM0";
-        //state["timestamp"] = millis();
-
-        // construct supporting JSON object - state_data
-        const size_t stateCapacity2 = JSON_ARRAY_SIZE(0) + JSON_OBJECT_SIZE(30) + 30;
-        DynamicJsonDocument state_data(stateCapacity2);
-
-        // output should be all the outputs whose state is requested e.g.:[2,3,78,80] or [all]
-        for (unsigned int y = 0; y < root["output"].size(); y++)
-        {
-            // when the request for state is for all devices connected
-            if (strcmp(root["output"][y], "all") == 0)
-            {
-                // output of all the digital outputs connected to controllino
-                for (unsigned int st = 0; st < TOTAL_OUTPUT_DEF_ARRAY; st++)
-                {
-                    int output = OUTPUT_DEF_ARRAY[st];
-                    bool outputState = digitalRead(output);
-
-                    // write state to JSON document
-                    state_data[String(output)].set(outputState);
-                }
-                // when the request for state is for few particular digital output pin(s)
-            }
-            else
-            {
-                int output = root["output"][y];
-                bool outputState = digitalRead(output);
-
-                // write state to JSON document
-                state_data[String(output)].set(outputState);
-            }
-        }
-
-        // convert Json document to String to be inserted into main Json
-        String state_data2pub = "";
-        serializeJson(state_data, state_data2pub);
-        // insert state_data into main Json - state
-        state["state_data"].set(serialized(state_data2pub));
-
-        // to be removed when working (testing only)
-        // print JSON onto Serial interface
-        Serial.println("JSON Pretty:");
-        String state2pub = "";
-        serializeJsonPretty(state, state2pub);
-        Serial.println();
-        // end (to be removed)
-
-        // publish state to requestor
-        // TODO: convert state2pub to char*
-        client.publish("STATE", state2pub);
-        // ... resubscribe
-        client.subscribe("ACM0");
-    }
-*/
-    //if (strcmp(action, "info") == 0)
     if (topicStr.indexOf("info") == 0)
     {
         Serial.println("ACM0 reconnected...'info' command received.");
         client.publish("ACM0/info_done", "info accomplished");
+        // ... and resubscribe
+        client.subscribe(controllino);
     }
 }
 
 boolean reconnect()
 {
-    // Serial.println("Attempting deviceACM1 - MQTT connection ...");
     if (client.connect("deviceACM0"))
     {
         // Once connected, publish an announcement...
-        //client.publish("ACM0", "{\"action\":\"info\"}");
-        client.publish("ACM0/info/0", "reconnected");
+        client.publish("ACM0/info", "reconnected");
         // ... and resubscribe
-        client.subscribe("ACM0/#");
+        client.subscribe(controllino);
     }
     return client.connected();
 }
@@ -259,10 +158,14 @@ void checkPressedPushButton(Button &btn)
 {
     for (int p = 0; p < PUSH_BUTTONS_TOTAL; p++)
     {
-        if (PUSH_BUTTONS_DEF[p].is(btn))
+        if (p_button[p].definition.is(btn))
         {
-            client.publish(PUSH_BUTTONS_ACT[0][p], PUSH_BUTTONS_ACT[1][p]);
-            client.subscribe("ACM0/#");
+            for (int tt = 0; tt < p_button[p].total_topics; tt++)
+            {
+                client.publish(p_button[p].topics[tt], p_button[p].payload);
+                // ... and resubscribe
+                client.subscribe(controllino);
+            }
         }
     }
 }
@@ -277,7 +180,7 @@ void setup()
     client.setServer(server, 1883);
     client.setCallback(callback);
 
-    client.subscribe("ACM0/#");
+    client.subscribe(controllino);
 
     // Setup ethernet
     Ethernet.begin(mac, ip);
@@ -287,13 +190,13 @@ void setup()
     // Configure the button as you'd like - not necessary if you're happy with the defaults
     for (int p1 = 0; p1 < PUSH_BUTTONS_TOTAL; p1++)
     {
-        PUSH_BUTTONS_DEF[p1].configureButton(configurePushButton);
+        p_button[p1].definition.configureButton(configurePushButton);
     }
 
     // When the button is first pressed, call the function checkPressedPushButton (above)
     for (int p2 = 0; p2 < PUSH_BUTTONS_TOTAL; p2++)
     {
-        PUSH_BUTTONS_DEF[p2].onPress(checkPressedPushButton);
+        p_button[p2].definition.onPress(checkPressedPushButton);
     }
 }
 
@@ -302,7 +205,7 @@ void loop()
     // Digital
     for (int p3 = 0; p3 < PUSH_BUTTONS_TOTAL; p3++)
     {
-        PUSH_BUTTONS_DEF[p3].update();
+        p_button[p3].definition.update();
     }
 
     // Analog
@@ -318,15 +221,19 @@ void loop()
     for (int aBarray = 0; aBarray < ANALOG_BUTTONS_TOTAL; aBarray++)
     {
         // dereference analog multi button reference
-        AnalogMultiButton *p0 = ANALOG_BUTTONS_DEF[aBarray];
+        AnalogMultiButton *p0 = am_button[aBarray].definition; // ANALOG_BUTTONS_DEF[aBarray];
         AnalogMultiButton deRefObject = *p0;
         // cycle through all possible buttons
         for (int aB = 0; aB < BUTTONS_TOTAL; aB++)
         {
             if (deRefObject.onPress(aB))
             {
-                client.publish(ANALOG_BUTTONS_ACT[0][aBarray][aB], ANALOG_BUTTONS_ACT[1][aBarray][aB]);
-                client.subscribe("ACM0/#");
+                for (int tt = 0; tt < am_button[aBarray].buttons[aB].total_topics; tt++)
+                {
+                    client.publish(am_button[aBarray].buttons[aB].topics[tt], am_button[aBarray].buttons[aB].payload);
+                    // ... and resubscribe
+                    client.subscribe(controllino);
+                }
             }
         }
     }

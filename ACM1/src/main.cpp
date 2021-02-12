@@ -23,102 +23,39 @@ PubSubClient client(ethClient);
 long lastReconnectAttempt = 0;
 
 /* New shutter code */
-// Function to check if the requested pin is controlling Blinds
-int checkBlindsPin(int pin)
+// Function to return Shutter based on position in the blindsArray array
+Shutters *resolveShutter(String recTopic)
 {
-    for (int pI = 0; pI < BLINDS_TOTAL; pI++)
+    for (unsigned int i = 0; i < BLINDS_TOTAL; i++)
     {
-        if (pin == BLINDS[pI] || pin == (BLINDS[pI] + 1))
+        if (recTopic.compareTo(blinds[i].entity) == 0)
         {
-            return pI;
+            return blinds[i].blind;
         }
     }
-
-    // needs to be more than BLINDS_TOTAL
-    return (65535 / 2);
+    return nullptr;
 }
 
-// Function to return Shutter based on position in the blindsArray array
-Shutters *resolveShutter(int index)
-{
-    return blindsArray[index];
-}
-
-// TODO: check if works as written...
 // Function to return blind's controllPin number by supplying Shutter refference
 int resolveShutterPin(Shutters *s)
 {
     for (int s0 = 0; s0 < BLINDS_TOTAL; s0++)
     {
-        if (s == resolveShutter(s0))
+        if (s == blinds[s0].blind)
         {
             // this callback was called from the blindsArray[s0]
-            return BLINDS[s0];
+            return blinds[s0].pin;
         }
     }
-}
 
-// Helper function to construct JSON for STATE reporting
-// TODO: define function to produce STATE JSON
-String getStateJSON(int pin)
-{
-    // function to take PIN number and create JSON object
-
-    // construct JSON object - state
-    const size_t stateCapacity = JSON_ARRAY_SIZE(0) + JSON_OBJECT_SIZE(2) + 30;
-    DynamicJsonDocument state(stateCapacity);
-
-    // add pin number
-    state["pin"] = (String)pin;
-
-    // check if state request is for a blind
-    int blindNum = checkBlindsPin(pin);
-    if (blindNum < BLINDS_TOTAL)
-    {
-        // resolve correct blind to work with
-        Shutters *blindOutput = resolveShutter(blindNum);
-
-        // set the output state based on whether it is moving or not
-        String blindOutputState = "";
-        if ((*blindOutput).isIdle())
-        {
-            blindOutputState = (String)(*blindOutput).getCurrentLevel();
-        }
-        else
-        {
-            blindOutputState = "moving";
-        }
-
-        // write the state to JSON
-        state["status"] = blindOutputState;
-    }
-    else
-    {
-        state["status"] = ((digitalRead(pin)) ? "on" : "off");
-    }
-
-    // define variable to return state for publish/print purposes
-    String state2pub;
-    serializeJson(state, state2pub);
-
-    return state2pub;
+    return -1;
 }
 
 // Main function handling operation of each shutter
 void shuttersOperationHandler(Shutters *s, ShuttersOperation operation)
 {
-    // TODO: Check if this works this way...
     controllPin = resolveShutterPin(s);
     directionPin = controllPin + 1;
-    /* old way of having the function here...
-    for (int s0 = 0; s0 < BLINDS_TOTAL; s0++) {
-        if (s == resolveShutter(s0)) {
-            // this callback was called from the blindsArray[s0]
-            controllPin = BLINDS[s0];
-            directionPin = controllPin + 1;
-            break;
-        }
-    }*/
 
     switch (operation)
     {
@@ -164,28 +101,35 @@ void shuttersWriteStateHandler(Shutters *shutters, const char *state, byte lengt
     }
 }
 
+String resolveShutterEntity (Shutters *s) 
+{
+    for (int s0 = 0; s0 < BLINDS_TOTAL; s0++)
+    {
+        if (s == blinds[s0].blind)
+        {
+            // this callback was called from the blindsArray[s0]
+            return blinds[s0].entity;
+        }
+    }
+
+    return "";
+}
+
 // Shutters level reached code to announce each whole percent
 void onShuttersLevelReached(Shutters *shutters, byte level)
 {
-    Serial.print("Shutters at ");
-    Serial.print(level);
-    Serial.println("%.");
-
-    // TODO: Test if it works as expected - provide status when the shutter stops.
     if ((*shutters).isIdle())
     {
-        String pin_state = getStateJSON(resolveShutterPin(shutters));
+        // construct state topic to report blind state
+        String stateTopic = "ACM1/";
+        stateTopic += resolveShutterEntity(shutters);
+        stateTopic += "/state";
+
         // publish state
-        client.publish("STATE", (char *)pin_state.c_str());
-    } /* zbytocne, lebo predosle by malo zachytit tento stav ak nie, tak skusit toto
-    else if (level == 100 || level == 0)
-    {
-        String pin_state = getStateJSON(resolveShutterPin(shutters));
-        // publish state
-        client.publish("STATE", (char *)pin_state.c_str());
-    }*/
-    // ... resubscribe
-    client.subscribe(controllino);
+        client.publish(stateTopic.c_str(), String(level).c_str());
+        // ... resubscribe
+        client.subscribe(controllino);
+    }
 }
 /* New shutter code end */
 
@@ -193,164 +137,146 @@ void onShuttersLevelReached(Shutters *shutters, byte level)
 void toggle(int pin)
 {
     digitalWrite(pin, !digitalRead(pin));
+}
 
-    // get state for publish
-    String pin_state = getStateJSON(pin);
-    // publish state
-    client.publish("STATE", (char *)pin_state.c_str());
-    // ... resubscribe
-    client.subscribe(controllino);
+// Helper function to find which output to choose for the topic received
+int returnPin(String recEntity)
+{
+    for (unsigned int i = 0; i < OUTPUTS_TOTAL; i++)
+    {
+        if (recEntity.compareTo(c_outputs[i].entity) == 0)
+        {
+            return c_outputs[i].pin;
+        };
+    };
+
+    return -1;
 }
 
 // MQTT callback
 void callback(char *topic, byte *payload, unsigned int length)
 {
+    // Convert the payload and topic (ACM0/light/kitchen/island) to workable strings
+    String message, topicStr, stateTopicTemp;
 
-    const size_t capacity = JSON_ARRAY_SIZE(10) + JSON_OBJECT_SIZE(2) + 30;
-    DynamicJsonDocument root(capacity);
-    deserializeJson(root, payload);
-
-    const char *action = root["action"];
-    if (strcmp(action, "toggle") == 0)
+    for (unsigned int i = 0; i < length; i++)
     {
-        for (unsigned int i = 0; i < root["output"].size(); i++)
-        {
-            const int button = root["output"][i];
-            if (button != 0)
-            {
-                toggle(button);
-                // to be removed when all is successful
-                Serial.print(button);
-                Serial.print("--");
-                Serial.println(digitalRead(button));
-                // end of "to be removed"
-            }
-        }
+        message += (char)payload[i];
     }
 
-    if (strcmp(action, "rolety") == 0)
+    // Construct state topic for publishing state back to hassio
+    // Preserve topic as a String for future checks
+    topicStr.concat(topic);
+    // Prepare temp topic to convert later to const char * for publishing
+    stateTopicTemp.concat(topic);
+    // Modify the received topic for reporting state
+    if (topicStr.indexOf("cmd") >= 0)
     {
-        // output should be all the blinds that needs to be moved [0,1,2,3,4,5]
-        for (unsigned int y = 0; y < root["output"].size(); y++)
+        stateTopicTemp.replace("cmd", "state");
+    }
+    else if (topicStr.indexOf("toggle") >= 0)
+    {
+        stateTopicTemp.replace("toggle", "state");
+    }
+    else
+    {
+        stateTopicTemp = "Topic is unknown command!";
+    }
+    const char *stateTopic = stateTopicTemp.c_str();
+
+    // Check the type to know what to do (cmd = hassio | toggle = switch)
+    if (topicStr.lastIndexOf("cmd") >= 0)
+    {
+        // Check the type to know what to do (light/outlet/blind)
+        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
         {
-            // set the blind to work with
-            int blind = root["output"][y];
-            Shutters *shutB = resolveShutter(blind);
+            // Get the pin by the entity
+            int foundPin = returnPin(topicStr.substring(5, topicStr.length() - String("/cmd").length()));
 
-            // prcnt should be between 0 (all the way up) and 100 (all the way down)
-            uint8_t percentage = uint8_t(root["prcnt"]);
-            // safeguard for overweighting prcnt value
-            if (percentage > 100)
+            // Check if request is to turn on and currently is off
+            if (message.compareTo("on") == 0 && digitalRead(foundPin) == LOW)
             {
-                percentage = 100;
+                // Switch the state and publish
+                toggle(foundPin);
+                client.publish(stateTopic, "on");
+                // ... and resubscribe
+                client.subscribe(controllino);
             }
-            else if (percentage < 0)
+            // Check if request it to turn off and currently is on
+            else if (message.compareTo("off") == 0 && digitalRead(foundPin) == HIGH)
             {
-                percentage = 0;
-            }
-
-            // check whether the blind is running when button has been pressed again
-            if ((*shutB).isIdle() != true && (percentage == 0 || percentage == 100))
-            {
-                (*shutB).stop();
-                // TODO: Need to test if STATE is published here, otherwise need to add
-                // to be removed when all working
-                Serial.println("Sensed button pressed again hence stopping blind.");
-                // end (to be removed)
+                // Switch the state and publish
+                toggle(foundPin);
+                client.publish(stateTopic, "off");
+                // ... and resubscribe
+                client.subscribe(controllino);
             }
             else
             {
-                // move the blind to the newly requested level
-                (*shutB).setLevel(percentage);
+                // When it is already in desired state, just publish back the state
+                client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off");
+                // ... and resubscribe
+                client.subscribe(controllino);
             }
-        }
+        };
     }
 
-    // state handling
-    if (strcmp(action, "state") == 0)
+    // Check the type to know what to do (cmd = hassio | toggle = switch)
+    if (topicStr.lastIndexOf("toggle") >= 0)
     {
-        unsigned int output_size = root["output"].size();
-        JsonArrayConst output_store = root["output"];
-
-        for (unsigned int y = 0; y < output_size; y++)
+        // Check the type to know what to do (light/outlet/blind)
+        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
         {
-            // ! TODO: figure out how to process these, as second is sent as 0;
-            const char *output_y = output_store[y];
-            // publish state
-            client.publish("STATE", output_y);
-            // ... resubscribe
+            // Get the pin by the entity
+            int foundPin = returnPin(topicStr.substring(5, topicStr.length() - String("/toggle").length()));
+
+            // Toggle the pin value
+            toggle(foundPin);
+            // Publish the state to the state topic
+            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off");
+            // ... and resubscribe
             client.subscribe(controllino);
-            // when the request for state is for all devices connected
-            if (strcmp(output_store[y], "all") == 0)
-            {
-                // output of all the digital outputs connected to controllino
-                for (unsigned int st = 0; st < TOTAL_OUTPUT_DEF_ARRAY; st++)
-                {
-                    // get state of output/PIN
-                    int output = OUTPUT_DEF_ARRAY[st];
-                    String pin_state = getStateJSON(output);
-                    // publish state
-                    client.publish("STATE", (char *)pin_state.c_str());
-                    // ... resubscribe
-                    client.subscribe(controllino);
-                }
+        };
+    }
 
-                // output of all the blinds
-                for (unsigned int st = 0; st < BLINDS_TOTAL; st++)
-                {
-                    // define blind_pin to get state for
-                    int blind_pin = BLINDS[st];
-                    String blind_state = getStateJSON(blind_pin);
-                    // publish state
-                    client.publish("STATE", (char *)blind_state.c_str());
-                    // ... resubscribe
-                    client.subscribe(controllino);
-                }
+    if (topicStr.indexOf("blind") >= 0)
+    {
+        // topic is only for the blind that needs to be handled
+        // set the blind to work with
+        Shutters *shutB = resolveShutter(topicStr.substring(5));
 
-                // when the request for state is for all blinds only
-            }
-            else if (strcmp(output_store[y], "blinds") == 0)
-            {
-                for (unsigned int st = 0; st < BLINDS_TOTAL; st++)
-                {
-                    // define blind_pin to get state for
-                    int blind_pin = BLINDS[st];
-                    String blind_state = getStateJSON(blind_pin);
-                    // publish state
-                    client.publish("STATE", (char *)blind_state.c_str());
-                    // ... resubscribe
-                    client.subscribe(controllino);
-                }
+        // prcnt should be between 0 (all the way up) and 100 (all the way down)
+        uint8_t percentage = message.toInt();
+        // safeguard for overweighting prcnt value
+        if (percentage > 100)
+        {
+            percentage = 100;
+        }
+        else if (percentage < 0)
+        {
+            percentage = 0;
+        }
 
-                // when the request is for controllino only
-            }
-            else if (strcmp(output_store[y], "controllino") == 0 || strcmp(output_store[y], "whois") == 0)
-            {
-                // publish state
-                client.publish("STATE", controllino);
-                // ... resubscribe
-                client.subscribe(controllino);
-
-                // when the request for state is for few particular digital output pin(s)
-            }
-            else
-            {
-                Serial.println("Going through single pin state.");
-                //const char * output = root["output"][y];
-                // get state of output/PIN
-                String pin_state = getStateJSON((int)output_y);
-                // publish state
-                client.publish("STATE", (char *)pin_state.c_str());
-                // ... resubscribe
-                client.subscribe(controllino);
-            }
+        // check whether the blind is running when button has been pressed again
+        if ((*shutB).isIdle() != true && (percentage == 0 || percentage == 100))
+        {
+            (*shutB).stop();
+        }
+        else
+        {
+            // move the blind to the newly requested level
+            (*shutB).setLevel(percentage);
         }
     }
 
-    if (strcmp(action, "info") == 0)
+    if (topicStr.indexOf("info") == 0)
     {
-        Serial.println("ACM1 reconnected...'info' command received.");
+        Serial.println("ACM0 reconnected...'info' command received.");
+        client.publish("ACM0/info_done", "info accomplished");
+        // ... and resubscribe
+        client.subscribe(controllino);
     }
+
 }
 
 boolean reconnect()
@@ -359,7 +285,7 @@ boolean reconnect()
     if (client.connect("deviceACM1"))
     {
         // Once connected, publish an announcement...
-        client.publish("ACM1", "{\"action\":\"info\"}");
+        client.publish("ACM1/info", "{\"action\":\"info\"}");
         // ... and resubscribe
         client.subscribe(controllino);
     }
@@ -379,12 +305,14 @@ void checkPressedButton(Button &btn)
 {
     for (int p = 0; p < PUSH_BUTTONS_TOTAL; p++)
     {
-        if (PUSH_BUTTONS_DEF[p].is(btn))
+        if (p_button[p].definition.is(btn))
         {
-            client.publish(PUSH_BUTTONS_ACT[0][p], PUSH_BUTTONS_ACT[1][p]);
-            client.subscribe(controllino);
-
-            Serial.println("PushButton from array pressed.");
+            for (int tt = 0; tt < p_button[p].total_topics; tt++)
+            {
+                client.publish(p_button[p].topics[tt], p_button[p].payload);
+                // ... and resubscribe
+                client.subscribe(controllino);
+            }
         }
     }
 }
@@ -419,15 +347,12 @@ void setup()
     // Initialize shutters
     for (int s1 = 0; s1 < BLINDS_TOTAL; s1++)
     {
-        // set the shutter to work with
-        Shutters *shut1 = resolveShutter(s1);
-
         // get the last stored state of the shutter
-        char storedShuttersState[(*shut1).getStateLength()];
-        readInEeprom(storedShuttersState, (*shut1).getStateLength());
+        char storedShuttersState[(*blinds[s1].blind).getStateLength()];
+        readInEeprom(storedShuttersState, (*blinds[s1].blind).getStateLength());
 
         // Initialize the shutter
-        (*shut1)
+        (*blinds[s1].blind)
             .setOperationHandler(shuttersOperationHandler)
             .setWriteStateHandler(shuttersWriteStateHandler)
             .restoreState(storedShuttersState)
@@ -441,20 +366,20 @@ void setup()
     // Configure the button as you'd like - not necessary if you're happy with the defaults
     for (int p1 = 0; p1 < PUSH_BUTTONS_TOTAL; p1++)
     {
-        PUSH_BUTTONS_DEF[p1].configureButton(configurePushButton);
+        p_button[p1].definition.configureButton(configurePushButton);
     }
 
-    // When the button is first pressed, call the function onButtonPressed (further down the page)
+    // When the button is first pressed, call the function checkPressedPushButton (above)
     for (int p2 = 0; p2 < PUSH_BUTTONS_TOTAL; p2++)
     {
-        PUSH_BUTTONS_DEF[p2].onPress(checkPressedButton);
+        p_button[p2].definition.onPress(checkPressedButton);
     }
 
     // initialize pinMode for blinds
     for (int pM = 0; pM < BLINDS_TOTAL; pM++)
     {
-        pinMode(BLINDS[pM], OUTPUT);
-        pinMode(BLINDS[pM] + 1, OUTPUT);
+        pinMode(blinds[pM].pin, OUTPUT);
+        pinMode(blinds[pM].pin + 1, OUTPUT);
     }
 }
 
@@ -463,14 +388,13 @@ void loop()
     // rolety / blinds - New shutters code
     for (int s2 = 0; s2 < BLINDS_TOTAL; s2++)
     {
-        Shutters *shut2 = resolveShutter(s2);
-        (*shut2).loop();
+        (*blinds[s2].blind).loop();
     }
 
     // Digital buttons
     for (int p3 = 0; p3 < PUSH_BUTTONS_TOTAL; p3++)
     {
-        PUSH_BUTTONS_DEF[p3].update();
+        p_button[p3].definition.update();
     }
 
     // Analog buttons
@@ -486,8 +410,12 @@ void loop()
         {
             if (AMBobject.onPress(aB))
             {
-                client.publish(ANALOG_BUTTONS_ACT[0][aB2][aB], ANALOG_BUTTONS_ACT[1][aB2][aB]);
-                client.subscribe(controllino);
+                for (int tt = 0; tt < am_button[aB2].buttons[aB].total_topics; tt++)
+                {
+                    client.publish(am_button[aB2].buttons[aB].topics[tt], am_button[aB2].buttons[aB].payload);
+                    // ... and resubscribe
+                    client.subscribe(controllino);
+                }
             }
         }
     }
