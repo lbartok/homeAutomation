@@ -115,8 +115,8 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
             {"s13_4_b", 1, {"ACM1/light/hallway/stairs/above/toggle"}}, 
             {"s13_4_c", 1, {"ACM1/blind/hallway/upstairs"}, "100"}, 
             {"s13_4_d", 1, {"ACM1/blind/hallway/upstairs"}, "0"}, 
-            {"s12_6_a", 1, {"ACM1/light/closet/main/toggle"}}, 
-            {"s12_6_b", 1, {"ACM1/light/bathroom/upstairs/main/toggle"}}
+            {"s12_6_a", 1, {"ACM1/light/bathroom/upstairs/main/toggle"}}, 
+            {"s12_6_b", 1, {"ACM1/light/closet/main/toggle"}}
         },
         BUTTONS_TOTAL
     },
@@ -137,10 +137,10 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
         "A14", &buttonsA14, 
         {
             {},
-            {"s11_4_a", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, 
-            {"s11_4_b", 1, {"ACM0/light/hallway/downstairs/entrance/toggle"}}, 
-            {"s11_4_c", 1, {"ACM0/light/outside/door/toggle"}}, 
-            {"s11_4_d", 1, {"ACM0/light/outside/door/toggle"}}, 
+            {"s11_4_a", 1, {"ACM0/light/outside/garage/toggle"}}, 
+            {"s11_4_b", 1, {"ACM0/light/outside/door/toggle"}}, 
+            {"s11_4_c", 1, {"ACM0/light/hallway/downstairs/entrance/toggle"}}, 
+            {"s11_4_d", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, 
             {"s11_7_a", 1, {"ACM0/light/outside/garage/toggle"}}, 
             {"s11_7_b", 1, {"ACM0/light/outside/porch/toggle"}}
         },
@@ -150,9 +150,9 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
         "A15", &buttonsA15, 
         {
             {},
-            {"s10_6_a", 1, {"ACM0/light/kitchen/island/toggle"}}, 
-            {"s10_6_b", 1, {"ACM0/light/kitchen/dining/toggle"}}, 
-            {"s10_6_c", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, 
+            {"s10_6_a", 1, {"ACM0/light/kitchen/dining/toggle"}}, 
+            {"s10_6_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, 
+            {"s10_6_c", 1, {"ACM0/light/kitchen/island/toggle"}}, 
             {"s10_6_d", 1, {"ACM0/light/kitchen/fridge/toggle"}}, 
             {"s11_6_a", 1, {"ACM0/light/outside/door/toggle"}}, 
             {"s11_6_b", 1, {"ACM0/light/outside/garage/toggle"}}
@@ -179,8 +179,8 @@ typedef struct p_btn
 p_btn p_button[] = {
     { "s13_5_a5", PushButton(CONTROLLINO_A5, PRESSED_WHEN_HIGH), 1, {"ACM1/light/hallway/upstairs/toggle"}},
     { "s12_7_a6", PushButton(CONTROLLINO_A6, PRESSED_WHEN_HIGH), 1, {"ACM1/light/closet/led/toggle"}},
-    { "s12_5_a7", PushButton(CONTROLLINO_A7, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/mirror/mom/toggle"}},
-    { "s12_4_a8", PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/mirror/dad/toggle"}},
+    { "s12_5_a7", PushButton(CONTROLLINO_A7, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
+    { "s12_4_a8", PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
     { "s12_3_a9", PushButton(CONTROLLINO_A9, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
     { "s11_5_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 1, {"ACM0/light/outside/door/toggle"}},
 }; 
