@@ -20,6 +20,7 @@
 byte mac[] = {0xDE, 0xED, 0xBB, 0xFE, 0xAF, 0xAA};
 IPAddress ip(192, 168, 69, 181);
 IPAddress server(192, 168, 69, 10);
+const char *controllino = "ACM0/#";
 
 // ---------------------------------------------------------------------------------
 // ANALOG BUTTONS SETUP
@@ -41,214 +42,110 @@ AnalogMultiButton buttonsA15(CONTROLLINO_A15, BUTTONS_TOTAL, BUTTONS_VALUES_2);
 AnalogMultiButton *ANALOG_BUTTONS_DEF[] = {
     &buttonsA0, &buttonsA1, &buttonsA2, &buttonsA4, &buttonsA13, &buttonsA14, &buttonsA15};
 const int ANALOG_BUTTONS_TOTAL = 7;
-// analog buttons actor array (needs to be same order as ANALOG_BUTTONS_DEF)
-const char *ANALOG_BUTTONS_ACT[2][ANALOG_BUTTONS_TOTAL][BUTTONS_TOTAL] = {
-    {//section for topic to which we post MQTT message
-     {
-         //A0 - Detska Juh
-         "",     //Button 0
-         "ACM1", //Button 1
-         "ACM1", //Button 2
-         "ACM1", //Button 3
-         "ACM1", //Button 4
-         "ACM1", //Button 5
-         "ACM1"  //Button 6
-     },
-     {
-         //A1 - Detska Sever
-         "",     //Button 0
-         "ACM1", //Button 1
-         "ACM1", //Button 2
-         "ACM1", //Button 3
-         "ACM1", //Button 4
-         "ACM1", //Button 5
-         "ACM1"  //Button 6
-     },
-     {
-         //A2
-         "",     //Button 0
-         "ACM1", //Button 1
-         "ACM1", //Button 2
-         "ACM0", //Button 3
-         "ACM0", //Button 4
-         "ACM1", //Button 5
-         "ACM1"  //Button 6
-     },
-     {
-         //A4
-         "",     //Button 0
-         "ACM1", //Button 1
-         "ACM1", //Button 2
-         "ACM1", //Button 3
-         "ACM1", //Button 4
-         "ACM1", //Button 5
-         "ACM1"  //Button 6
-     },
-     {
-         //A13
-         "",     //Button 0
-         "ACM1", //Button 1
-         "ACM1", //Button 2
-         "ACM1", //Button 3
-         "ACM1", //Button 4
-         "ACM1", //Button 5
-         "ACM1"  //Button 6
-     },
-     {
-         //A14
-         "",     //Button 0
-         "ACM0", //Button 1
-         "ACM0", //Button 2
-         "ACM0", //Button 3
-         "ACM0", //Button 4
-         "ACM0", //Button 5
-         "ACM0"  //Button 6
-     },
-     {
-         //A15
-         "",     //Button 0
-         "ACM0", //Button 1
-         "ACM0", //Button 2
-         "ACM0", //Button 3
-         "ACM0", //Button 4
-         "ACM0", //Button 5
-         "ACM0"  //Button 6
-     }},
-    {//section for actual message to post in MQTT
-     {
-         //A0
-         "",                                                         //Button 0
-         "{\"action\":\"toggle\",\"output\":[5, 6]}",                //Button 1
-         "{\"action\":\"toggle\",\"output\":[5, 6]}",                //Button 2
-         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[2]}",   //Button 3
-         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[2]}", //Button 4
-         "{\"action\":\"toggle\",\"output\":[11]}",                  //Button 5
-         "{\"action\":\"toggle\",\"output\":[9]}"                    //Button 6
-     },
-     {
-         //A1
-         "",                                                         //Button 0
-         "{\"action\":\"toggle\",\"output\":[5, 6]}",                //Button 1
-         "{\"action\":\"toggle\",\"output\":[5, 6]}",                //Button 2
-         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[3]}", //Button 3
-         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[3]}",   //Button 4
-         "{\"action\":\"toggle\",\"output\":[11]}",                  //Button 5
-         "{\"action\":\"toggle\",\"output\":[10]}"                   //Button 6
-     },
-     {
-         //A2
-         "",                                        //Button 0
-         "{\"action\":\"toggle\",\"output\":[2]}",  //Button 1
-         "{\"action\":\"toggle\",\"output\":[3]}",  //Button 2
-         "{\"action\":\"toggle\",\"output\":[45]}", //Button 3
-         "{\"action\":\"toggle\",\"output\":[78]}", //Button 4
-         "{\"action\":\"toggle\",\"output\":[11]}", //Button 5
-         "{\"action\":\"toggle\",\"output\":[7]}"   //Button 6
-     },
-     {
-         //A4
-         "",                                                         //Button 0
-         "{\"action\":\"toggle\",\"output\":[2]}",                   //Button 1
-         "{\"action\":\"toggle\",\"output\":[3]}",                   //Button 2
-         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[1]}", //Button 3
-         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[1]}",   //Button 4
-         "{\"action\":\"toggle\",\"output\":[42]}",                  //Button 5
-         "{\"action\":\"toggle\",\"output\":[7]}"                    //Button 6
-     },
-     {
-         //A13
-         "",                                                         //Button 0
-         "{\"action\":\"toggle\",\"output\":[13]}",                  //Button 1
-         "{\"action\":\"toggle\",\"output\":[13]}",                  //Button 2
-         "{\"action\":\"rolety\",\"prcnt\":\"100\",\"output\":[0]}", //Button 3
-         "{\"action\":\"rolety\",\"prcnt\":\"0\",\"output\":[0]}",   //Button 4
-         "{\"action\":\"toggle\",\"output\":[11]}",                  //Button 5
-         "{\"action\":\"toggle\",\"output\":[11]}"                   //Button 6
-     },
-     {
-         //A14
-         "",                                        //Button 0
-         "{\"action\":\"toggle\",\"output\":[12]}", //Button 1
-         "{\"action\":\"toggle\",\"output\":[4]}",  //Button 2
-         "{\"action\":\"toggle\",\"output\":[78]}", //Button 3
-         "{\"action\":\"toggle\",\"output\":[78]}", //Button 4
-         "{\"action\":\"toggle\",\"output\":[79]}", //Button 5
-         "{\"action\":\"toggle\",\"output\":[80]}"  //Button 6
-     },
-     {
-         //A15
-         "",                                        //Button 0
-         "{\"action\":\"toggle\",\"output\":[10]}", //Button 1
-         "{\"action\":\"toggle\",\"output\":[12]}", //Button 2
-         "{\"action\":\"toggle\",\"output\":[9]}",  //Button 3
-         "{\"action\":\"toggle\",\"output\":[8]}",  //Button 4
-         "{\"action\":\"toggle\",\"output\":[78]}", //Button 5
-         "{\"action\":\"toggle\",\"output\":[79]}"  //Button 6
-     }}};
+
+// define analog multi button structure to allow for streamlined handling
+// am_button[0].name = A0 = input name on the controllino
+// am_button[0].definition > reference to the analogMultiButton object
+// am_button[0].total_buttons > number of buttons associated with multiButton
+// am_button[0].buttons[0].name = s10_5_a > name of the switch and button on it
+// am_button[0].buttons[0].total_topics > number of topics associated with particular button
+// am_button[0].buttons[0].topics[0] = "ACM0/light/#" > topic(s) to turn up
+
+typedef struct SubButton
+{
+    const char *name;
+    int total_topics;
+    const char *topics[2];
+    const char *payload;
+} SubButton;
+
+typedef struct AmB
+{
+    String name;
+    AnalogMultiButton *definition;
+    SubButton buttons[BUTTONS_TOTAL];
+    int total_buttons;
+} AmB;
+
+AmB am_button[ANALOG_BUTTONS_TOTAL] = {
+    {"A0", &buttonsA0, {
+                           {},
+                           {"s13_8_a", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}},
+                           {"s13_8_b", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}},
+                           {"s13_8_c", 1, {"ACM1/blind/adka"}, "100"},
+                           {"s13_8_d", 1, {"ACM1/blind/adka"}, "0"},
+                           {"s13_2_a", 1, {"ACM1/light/parents/main/toggle"}},
+                           {"s13_2_b", 1, {"ACM1/light/parents/dad/toggle"}},
+                       },
+     BUTTONS_TOTAL},
+    {"A1", &buttonsA1, {{}, {"s13_7_a", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}}, {"s13_7_b", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}}, {"s13_7_c", 1, {"ACM1/blind/misko"}, "100"}, {"s13_7_d", 1, {"ACM1/blind/misko"}, "0"}, {"s13_1_a", 1, {"ACM1/light/parents/main/toggle"}}, {"s13_1_b", 1, {"ACM1/light/parents/mom/toggle"}}}, BUTTONS_TOTAL},
+    {"A2", &buttonsA2, {{}, {"s13_6_a", 1, {"ACM1/light/hallway/upstairs/toggle"}}, {"s13_6_b", 1, {"ACM1/light/hallway/stairs/above/toggle"}}, {"s13_6_c", 1, {"ACM0/light/hallway/stairs/led/toggle"}}, {"s13_6_d", 1, {"ACM0/light/outside/door/toggle"}}, {"s12_8_a", 1, {"ACM1/light/parents/main/toggle"}}, {"s12_8_b", 1, {"ACM1/light/closet/main/toggle"}}}, BUTTONS_TOTAL},
+    {"A4", &buttonsA4, {{}, {"s13_4_a", 1, {"ACM1/light/hallway/upstairs/toggle"}}, {"s13_4_b", 1, {"ACM1/light/hallway/stairs/above/toggle"}}, {"s13_4_c", 1, {"ACM1/blind/hallway/upstairs"}, "100"}, {"s13_4_d", 1, {"ACM1/blind/hallway/upstairs"}, "0"}, {"s12_6_a", 1, {"ACM1/light/bathroom/upstairs/main/toggle"}}, {"s12_6_b", 1, {"ACM1/light/closet/main/toggle"}}}, BUTTONS_TOTAL},
+    {"A13", &buttonsA13, {{}, {"s12_2_a", 1, {"ACM1/light/toilet/upstairs/main/toggle"}}, {"s12_2_b", 1, {"ACM1/light/toilet/upstairs/main/toggle"}}, {"s13_3_a", 1, {"ACM1/blind/parents"}, "100"}, {"s13_3_b", 1, {"ACM1/blind/parents"}, "0"}, {"s13_3_c", 1, {"ACM1/light/parents/main/toggle"}}, {"s13_3_d", 1, {"ACM1/light/parents/main/toggle"}}}, BUTTONS_TOTAL},
+    {"A14", &buttonsA14, {{}, {"s11_4_a", 1, {"ACM0/light/outside/garage/toggle"}}, {"s11_4_b", 1, {"ACM0/light/outside/door/toggle"}}, {"s11_4_c", 1, {"ACM0/light/hallway/downstairs/entrance/toggle"}}, {"s11_4_d", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, {"s11_7_a", 1, {"ACM0/light/outside/garage/toggle"}}, {"s11_7_b", 1, {"ACM0/light/outside/porch/toggle"}}}, BUTTONS_TOTAL},
+    {"A15", &buttonsA15, {{}, {"s10_6_a", 1, {"ACM0/light/kitchen/dining/toggle"}}, {"s10_6_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, {"s10_6_c", 1, {"ACM0/light/kitchen/island/toggle"}}, {"s10_6_d", 1, {"ACM0/light/kitchen/fridge/toggle"}}, {"s11_6_a", 1, {"ACM0/light/outside/door/toggle"}}, {"s11_6_b", 1, {"ACM0/light/outside/garage/toggle"}}}, BUTTONS_TOTAL}};
 
 // ---------------------------------------------------------------------------------
 // PUSH BUTTONS SETUP
 // ---------------------------------------------------------------------------------
 
+// define push button multi array
+typedef struct p_btn
+{
+    const char *name;
+    PushButton definition;
+    int total_topics;
+    const char *topics[1];
+    const char *payload;
+} p_btn;
+
 // push buttons definition array
+p_btn p_button[] = {
+    {"s13_5_a5", PushButton(CONTROLLINO_A5, PRESSED_WHEN_HIGH), 1, {"ACM1/light/hallway/upstairs/toggle"}},
+    {"s12_7_a6", PushButton(CONTROLLINO_A6, PRESSED_WHEN_HIGH), 1, {"ACM1/light/closet/led/toggle"}},
+    {"s12_5_a7", PushButton(CONTROLLINO_A7, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
+    {"s12_4_a8", PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
+    {"s12_3_a9", PushButton(CONTROLLINO_A9, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
+    {"s11_5_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 1, {"ACM0/light/outside/door/toggle"}},
+};
 const int PUSH_BUTTONS_TOTAL = 6;
-PushButton PUSH_BUTTONS_DEF[PUSH_BUTTONS_TOTAL] = {
-    PushButton(CONTROLLINO_A5, PRESSED_WHEN_HIGH),
-    PushButton(CONTROLLINO_A6, PRESSED_WHEN_HIGH),
-    PushButton(CONTROLLINO_A7, PRESSED_WHEN_HIGH),
-    PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH),
-    PushButton(CONTROLLINO_A9, PRESSED_WHEN_HIGH),
-    PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH)};
-// push buttons actor array (needs to be same order as PUSH_BUTTONS_DEF)
-const char *PUSH_BUTTONS_ACT[2][PUSH_BUTTONS_TOTAL] = {
-    {
-        //section for topic to which we post in MQTT
-        "ACM1", //A5
-        "ACM1", //A6
-        "ACM1", //A7
-        "ACM1", //A8
-        "ACM1", //A9
-        "ACM0"  //A11
-    },
-    {
-        //section for actual message to post in MQTT
-        "{\"action\":\"toggle\",\"output\":[2]}",  //A5
-        "{\"action\":\"toggle\",\"output\":[8]}",  //A6
-        "{\"action\":\"toggle\",\"output\":[42]}", //A7
-        "{\"action\":\"toggle\",\"output\":[42]}", //A8
-        "{\"action\":\"toggle\",\"output\":[42]}", //A9
-        "{\"action\":\"toggle\",\"output\":[78]}", //A11
-    }};
 
 // ---------------------------------------------------------------------------------
 // OUTPUT DEFINITION
 // ---------------------------------------------------------------------------------
 
-// outputs definition array for being able to read the state through function
-const int OUTPUT_DEF_ARRAY[] = {
-    CONTROLLINO_D0,
-    CONTROLLINO_D1,
-    CONTROLLINO_D2,
-    CONTROLLINO_D3,
-    CONTROLLINO_D4,
-    CONTROLLINO_D5,
-    CONTROLLINO_D6,
-    CONTROLLINO_D7,
-    CONTROLLINO_D8,
-    CONTROLLINO_D9,
-    CONTROLLINO_D10,
-    CONTROLLINO_D11,
-    CONTROLLINO_D12,
-    CONTROLLINO_D13,
-    CONTROLLINO_D14,
-    CONTROLLINO_D15,
-    CONTROLLINO_D16,
-    CONTROLLINO_D17,
-    CONTROLLINO_D18,
-    CONTROLLINO_D19,
-    CONTROLLINO_D20,
-    CONTROLLINO_D21,
-    CONTROLLINO_D22,
-    CONTROLLINO_D23};
+const int OUTPUTS_TOTAL = 24;
+typedef struct c_output
+{
+    const char *name;
+    int pin;
+    String entity;
+} c_output;
+
+c_output c_outputs[OUTPUTS_TOTAL] = {
+    {"el_49", CONTROLLINO_D0, "light/bathroom/downstairs/mirror"},
+    {"el_51", CONTROLLINO_D1, "light/tech_room"},
+    {"el_52", CONTROLLINO_D2, "light/hallway/downstairs/entrance"},
+    {"el_53", CONTROLLINO_D3, "light/bathroom/downstairs/main"},
+    {"el_54", CONTROLLINO_D4, "light/pantry"},
+    {"el_55", CONTROLLINO_D5, "light/kitchen/led"},
+    {"el_56", CONTROLLINO_D6, "light/kitchen/fridge"},
+    {"el_57", CONTROLLINO_D7, "light/kitchen/island"},
+    {"el_58", CONTROLLINO_D8, "light/kitchen/dining"},
+    {"el_61", CONTROLLINO_D9, "light/guest_room"},
+    {"el_62_63", CONTROLLINO_D10, "light/hallway/downstairs/main"},
+    {"el_64", CONTROLLINO_D11, "light/living_room/hallway"},
+    {"el_66", CONTROLLINO_D12, "light/living_room/led/ceiling"},
+    {"el_68", CONTROLLINO_D15, "light/hallway/stairs/led"},
+    {"el_65", CONTROLLINO_D13, "light/living_room/led/tv"},
+    {"el_67", CONTROLLINO_D14, "light/living_room/center"},
+    {"el_71", CONTROLLINO_D16, "light/living_room/1"},
+    {"el_72", CONTROLLINO_D17, "light/living_room/2"},
+    {"el_73", CONTROLLINO_D18, "light/living_room/3"},
+    {"el_74", CONTROLLINO_D19, "light/living_room/4"},
+    {"el_75", CONTROLLINO_D20, "light/living_room/5"},
+    {"el_76", CONTROLLINO_D21, "light/outside/door"},
+    {"el_77", CONTROLLINO_D22, "light/outside/garage"},
+    {"el_78", CONTROLLINO_D23, "light/outside/porch"}};
 
 #endif
