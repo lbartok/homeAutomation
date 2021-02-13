@@ -21,6 +21,7 @@ byte mac[] = {0xDE, 0xED, 0xBB, 0xFE, 0xAF, 0xAA};
 IPAddress ip(192, 168, 69, 181);
 IPAddress server(192, 168, 69, 10);
 const char *controllino = "ACM0/#";
+boolean retain = true;
 
 // ---------------------------------------------------------------------------------
 // ANALOG BUTTONS SETUP

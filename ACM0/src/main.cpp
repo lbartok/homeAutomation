@@ -83,7 +83,7 @@ void callback(char *topic, byte *payload, unsigned int length)
             {
                 // Switch the state and publish
                 toggle(foundPin);
-                client.publish(stateTopic, "on");
+                client.publish(stateTopic, "on", retain);
                 // ... and resubscribe
                 client.subscribe(controllino);
             }
@@ -92,14 +92,14 @@ void callback(char *topic, byte *payload, unsigned int length)
             {
                 // Switch the state and publish
                 toggle(foundPin);
-                client.publish(stateTopic, "off");
+                client.publish(stateTopic, "off", retain);
                 // ... and resubscribe
                 client.subscribe(controllino);
             }
             else
             {
                 // When it is already in desired state, just publish back the state
-                client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off");
+                client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
                 // ... and resubscribe
                 client.subscribe(controllino);
             }
@@ -118,7 +118,7 @@ void callback(char *topic, byte *payload, unsigned int length)
             // Toggle the pin value
             toggle(foundPin);
             // Publish the state to the state topic
-            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off");
+            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
             // ... and resubscribe
             client.subscribe(controllino);
         };
