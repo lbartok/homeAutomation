@@ -68,13 +68,23 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
                            {},
                            {"s10_5_a", 1, {"ACM0/light/kitchen/island/toggle"}},
                            {"s10_5_b", 1, {"ACM0/light/kitchen/fridge/toggle"}},
-                           {"s10_5_c", 1, {"ACM1/blind/kitchen"}, "0"},
-                           {"s10_5_d", 1, {"ACM1/blind/kitchen"}, "100"},
+                           {"s10_5_c", 1, {"ACM1/blind/kitchen/cmd"}, "open"},
+                           {"s10_5_d", 1, {"ACM1/blind/kitchen/cmd"}, "close"},
                            {"s10_5_e", 1, {"ACM0/light/hallway/downstairs/main/toggle"}},
                            {"s10_5_f", 1, {"ACM0/light/kitchen/dining/toggle"}},
                        },
      BUTTONS_TOTAL},
-    {"A7", &buttonsA7, {{}, {"s10_3_a", 2, {"ACM0/light/living_room/hallway/toggle", "ACM0/light/living_room/center/toggle"}}, {"s10_3_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, {"s10_3_c", 1, {"ACM1/blind/living_room"}, "100"}, {"s10_3_d", 1, {"ACM1/blind/living_room"}, "0"}, {"s10_3_e", 1, {"ACM0/light/outside/porch/toggle"}}, {"s10_3_f", 2, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle"}}}, BUTTONS_TOTAL}};
+    {"A7", &buttonsA7, {
+                           {}, 
+                           {"s10_3_a", 2, {"ACM0/light/living_room/hallway/toggle", "ACM0/light/living_room/center/toggle"}}, 
+                           {"s10_3_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, 
+                           {"s10_3_c", 1, {"ACM1/blind/living_room/cmd"}, "close"}, 
+                           {"s10_3_d", 1, {"ACM1/blind/living_room/cmd"}, "open"}, 
+                           {"s10_3_e", 1, {"ACM0/light/outside/porch/toggle"}}, 
+                           {"s10_3_f", 2, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle"}}
+                        }, 
+     BUTTONS_TOTAL}
+    };
 
 // ---------------------------------------------------------------------------------
 // PUSH BUTTONS SETUP
@@ -100,12 +110,12 @@ p_btn p_button[] = {
     {"s11_1_a10", PushButton(CONTROLLINO_A10, PRESSED_WHEN_HIGH), 1, {"ACM0/light/bathroom/downstairs/main/toggle"}},
     {"s10_8_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 2, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle"}},
     {"s10_7_a12", PushButton(CONTROLLINO_A12, PRESSED_WHEN_HIGH), 2, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle"}},
-    {"s10_4_f", PushButton(CONTROLLINO_A13, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/4/toggle"}},
+    {"s10_4_f", PushButton(CONTROLLINO_A13, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/four/toggle"}},
     {"s10_4_d", PushButton(CONTROLLINO_A14, PRESSED_WHEN_HIGH), 1, {"ACM0/light/hallway/stairs/led/toggle"}},
-    {"s10_4_a", PushButton(CONTROLLINO_A15, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/1/toggle"}},
-    {"s10_4_b", PushButton(CONTROLLINO_I16, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/2/toggle"}},
+    {"s10_4_a", PushButton(CONTROLLINO_A15, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/one/toggle"}},
+    {"s10_4_b", PushButton(CONTROLLINO_I16, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/two/toggle"}},
     {"s10_4_c", PushButton(CONTROLLINO_I17, PRESSED_WHEN_HIGH), 1, {"ACM1/light/hallway/stairs/above/toggle"}},
-    {"s10_4_e", PushButton(CONTROLLINO_I18, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/3/toggle"}}};
+    {"s10_4_e", PushButton(CONTROLLINO_I18, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/three/toggle"}}};
 
 const int PUSH_BUTTONS_TOTAL = 13;
 

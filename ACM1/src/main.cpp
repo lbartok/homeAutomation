@@ -168,20 +168,8 @@ void callback(char *topic, byte *payload, unsigned int length)
     // Preserve topic as a String for future checks
     topicStr.concat(topic);
     // Prepare temp topic to convert later to const char * for publishing
-    stateTopicTemp.concat(topic);
-    // Modify the received topic for reporting state
-    if (topicStr.indexOf("cmd") >= 0)
-    {
-        stateTopicTemp.replace("cmd", "state");
-    }
-    else if (topicStr.indexOf("toggle") >= 0)
-    {
-        stateTopicTemp.replace("toggle", "state");
-    }
-    else
-    {
-        stateTopicTemp = "Topic is unknown command!";
-    }
+    stateTopicTemp.concat(topicStr.substring(0,topicStr.lastIndexOf("/")));
+    stateTopicTemp.concat("/state");
     const char *stateTopic = stateTopicTemp.c_str();
 
     // Check the type to know what to do (cmd = hassio | toggle = switch)
@@ -191,38 +179,53 @@ void callback(char *topic, byte *payload, unsigned int length)
         if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
         {
             // Get the pin by the entity
-            int foundPin = returnPin(topicStr.substring(5, topicStr.length() - String("/cmd").length()));
+            int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
 
             // Check if request is to turn on and currently is off
-            if (message.compareTo("on") == 0 && digitalRead(foundPin) == LOW)
+            if ((message.equalsIgnoreCase("on") && digitalRead(foundPin) == LOW) || (message.equalsIgnoreCase("off") && digitalRead(foundPin) == HIGH))
             {
-                // Switch the state and publish
+                // Switch the state
                 toggle(foundPin);
-                client.publish(stateTopic, "on", retain);
-                // ... and resubscribe
-                client.subscribe(controllino);
             }
-            // Check if request it to turn off and currently is on
-            else if (message.compareTo("off") == 0 && digitalRead(foundPin) == HIGH)
+
+            // When it is already in desired state, just publish back the state
+            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
+            // ... and resubscribe
+            client.subscribe(controllino);
+        }
+        else if (topicStr.indexOf("blind") >= 0) 
+        {
+            // set the blind to work with
+            Shutters *shutB = resolveShutter(topicStr.substring(5, topicStr.lastIndexOf("/")));
+
+            // need to convert message received: "open" => 0 (all the way up), "close" => 100 (all the way down)
+            // "stop" => ehm stop... (switches do not have STOP button, hence the special handling)
+            
+            // check whether the blind is running when button has been pressed again
+            if (message.equalsIgnoreCase("stop")) 
             {
-                // Switch the state and publish
-                toggle(foundPin);
-                client.publish(stateTopic, "off", retain);
-                // ... and resubscribe
-                client.subscribe(controllino);
+                (*shutB).stop();
+            }
+            else if (!(*shutB).isIdle() && (message.equalsIgnoreCase("open") || message.equalsIgnoreCase("close")))
+            {
+                (*shutB).stop();
+            }
+            else if (message.equalsIgnoreCase("open"))
+            {
+                (*shutB).setLevel(0);
+            }
+            else if (message.equalsIgnoreCase("close"))
+            {
+                (*shutB).setLevel(100);
             }
             else
             {
-                // When it is already in desired state, just publish back the state
-                client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
-                // ... and resubscribe
-                client.subscribe(controllino);
+                Serial.println("I have no idea what you want to do with the blind!");
             }
-        };
+        }
     }
-
     // Check the type to know what to do (cmd = hassio | toggle = switch)
-    if (topicStr.lastIndexOf("toggle") >= 0)
+    else if (topicStr.lastIndexOf("toggle") >= 0)
     {
         // Check the type to know what to do (light/outlet/blind)
         if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
@@ -236,14 +239,13 @@ void callback(char *topic, byte *payload, unsigned int length)
             client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
             // ... and resubscribe
             client.subscribe(controllino);
-        };
+        }
     }
-
-    if (topicStr.indexOf("blind") >= 0)
+    // when HassIO will set position through slider
+    else if (topicStr.indexOf("set") >= 0)
     {
-        // topic is only for the blind that needs to be handled
         // set the blind to work with
-        Shutters *shutB = resolveShutter(topicStr.substring(5));
+        Shutters *shutB = resolveShutter(topicStr.substring(5, topicStr.lastIndexOf("/")));
 
         // prcnt should be between 0 (all the way up) and 100 (all the way down)
         uint8_t percentage = message.toInt();
@@ -257,16 +259,8 @@ void callback(char *topic, byte *payload, unsigned int length)
             percentage = 0;
         }
 
-        // check whether the blind is running when button has been pressed again
-        if ((*shutB).isIdle() != true && (percentage == 0 || percentage == 100))
-        {
-            (*shutB).stop();
-        }
-        else
-        {
-            // move the blind to the newly requested level
-            (*shutB).setLevel(percentage);
-        }
+        // move the blind to the newly requested level
+        (*shutB).setLevel(percentage);
     }
 
     if (topicStr.indexOf("info") == 0)

@@ -73,18 +73,72 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
                            {},
                            {"s13_8_a", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}},
                            {"s13_8_b", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}},
-                           {"s13_8_c", 1, {"ACM1/blind/adka"}, "100"},
-                           {"s13_8_d", 1, {"ACM1/blind/adka"}, "0"},
+                           {"s13_8_c", 1, {"ACM1/blind/adka/cmd"}, "close"},
+                           {"s13_8_d", 1, {"ACM1/blind/adka/cmd"}, "open"},
                            {"s13_2_a", 1, {"ACM1/light/parents/main/toggle"}},
                            {"s13_2_b", 1, {"ACM1/light/parents/dad/toggle"}},
                        },
      BUTTONS_TOTAL},
-    {"A1", &buttonsA1, {{}, {"s13_7_a", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}}, {"s13_7_b", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}}, {"s13_7_c", 1, {"ACM1/blind/misko"}, "100"}, {"s13_7_d", 1, {"ACM1/blind/misko"}, "0"}, {"s13_1_a", 1, {"ACM1/light/parents/main/toggle"}}, {"s13_1_b", 1, {"ACM1/light/parents/mom/toggle"}}}, BUTTONS_TOTAL},
-    {"A2", &buttonsA2, {{}, {"s13_6_a", 1, {"ACM1/light/hallway/upstairs/toggle"}}, {"s13_6_b", 1, {"ACM1/light/hallway/stairs/above/toggle"}}, {"s13_6_c", 1, {"ACM0/light/hallway/stairs/led/toggle"}}, {"s13_6_d", 1, {"ACM0/light/outside/door/toggle"}}, {"s12_8_a", 1, {"ACM1/light/parents/main/toggle"}}, {"s12_8_b", 1, {"ACM1/light/closet/main/toggle"}}}, BUTTONS_TOTAL},
-    {"A4", &buttonsA4, {{}, {"s13_4_a", 1, {"ACM1/light/hallway/upstairs/toggle"}}, {"s13_4_b", 1, {"ACM1/light/hallway/stairs/above/toggle"}}, {"s13_4_c", 1, {"ACM1/blind/hallway/upstairs"}, "100"}, {"s13_4_d", 1, {"ACM1/blind/hallway/upstairs"}, "0"}, {"s12_6_a", 1, {"ACM1/light/bathroom/upstairs/main/toggle"}}, {"s12_6_b", 1, {"ACM1/light/closet/main/toggle"}}}, BUTTONS_TOTAL},
-    {"A13", &buttonsA13, {{}, {"s12_2_a", 1, {"ACM1/light/toilet/upstairs/main/toggle"}}, {"s12_2_b", 1, {"ACM1/light/toilet/upstairs/main/toggle"}}, {"s13_3_a", 1, {"ACM1/blind/parents"}, "100"}, {"s13_3_b", 1, {"ACM1/blind/parents"}, "0"}, {"s13_3_c", 1, {"ACM1/light/parents/main/toggle"}}, {"s13_3_d", 1, {"ACM1/light/parents/main/toggle"}}}, BUTTONS_TOTAL},
-    {"A14", &buttonsA14, {{}, {"s11_4_a", 1, {"ACM0/light/outside/garage/toggle"}}, {"s11_4_b", 1, {"ACM0/light/outside/door/toggle"}}, {"s11_4_c", 1, {"ACM0/light/hallway/downstairs/entrance/toggle"}}, {"s11_4_d", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, {"s11_7_a", 1, {"ACM0/light/outside/garage/toggle"}}, {"s11_7_b", 1, {"ACM0/light/outside/porch/toggle"}}}, BUTTONS_TOTAL},
-    {"A15", &buttonsA15, {{}, {"s10_6_a", 1, {"ACM0/light/kitchen/dining/toggle"}}, {"s10_6_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, {"s10_6_c", 1, {"ACM0/light/kitchen/island/toggle"}}, {"s10_6_d", 1, {"ACM0/light/kitchen/fridge/toggle"}}, {"s11_6_a", 1, {"ACM0/light/outside/door/toggle"}}, {"s11_6_b", 1, {"ACM0/light/outside/garage/toggle"}}}, BUTTONS_TOTAL}};
+    {"A1", &buttonsA1, {
+                           {}, 
+                           {"s13_7_a", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}}, 
+                           {"s13_7_b", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}}, 
+                           {"s13_7_c", 1, {"ACM1/blind/misko/cmd"}, "close"}, 
+                           {"s13_7_d", 1, {"ACM1/blind/misko/cmd"}, "open"}, 
+                           {"s13_1_a", 1, {"ACM1/light/parents/main/toggle"}}, 
+                           {"s13_1_b", 1, {"ACM1/light/parents/mom/toggle"}}
+                       }, 
+     BUTTONS_TOTAL},
+    {"A2", &buttonsA2, {
+                           {}, 
+                           {"s13_6_a", 1, {"ACM1/light/hallway/upstairs/toggle"}}, 
+                           {"s13_6_b", 1, {"ACM1/light/hallway/stairs/above/toggle"}}, 
+                           {"s13_6_c", 1, {"ACM0/light/hallway/stairs/led/toggle"}}, 
+                           {"s13_6_d", 1, {"ACM0/light/outside/door/toggle"}}, 
+                           {"s12_8_a", 1, {"ACM1/light/parents/main/toggle"}}, 
+                           {"s12_8_b", 1, {"ACM1/light/closet/main/toggle"}}
+                       }, 
+     BUTTONS_TOTAL},
+    {"A4", &buttonsA4, {
+                           {}, 
+                           {"s13_4_a", 1, {"ACM1/light/hallway/upstairs/toggle"}}, 
+                           {"s13_4_b", 1, {"ACM1/light/hallway/stairs/above/toggle"}}, 
+                           {"s13_4_c", 1, {"ACM1/blind/hallway/upstairs/cmd"}, "close"}, 
+                           {"s13_4_d", 1, {"ACM1/blind/hallway/upstairs/cmd"}, "open"}, 
+                           {"s12_6_a", 1, {"ACM1/light/bathroom/upstairs/main/toggle"}}, 
+                           {"s12_6_b", 1, {"ACM1/light/closet/main/toggle"}}
+                       }, 
+     BUTTONS_TOTAL},
+    {"A13", &buttonsA13, {
+                             {}, 
+                             {"s12_2_a", 1, {"ACM1/light/toilet/upstairs/main/toggle"}}, 
+                             {"s12_2_b", 1, {"ACM1/light/toilet/upstairs/main/toggle"}}, 
+                             {"s13_3_a", 1, {"ACM1/blind/parents/cmd"}, "close"}, 
+                             {"s13_3_b", 1, {"ACM1/blind/parents/cmd"}, "open"}, 
+                             {"s13_3_c", 1, {"ACM1/light/parents/main/toggle"}}, 
+                             {"s13_3_d", 1, {"ACM1/light/parents/main/toggle"}}
+                         }, 
+     BUTTONS_TOTAL},
+    {"A14", &buttonsA14, {
+                             {}, 
+                             {"s11_4_a", 1, {"ACM0/light/outside/garage/toggle"}}, 
+                             {"s11_4_b", 1, {"ACM0/light/outside/door/toggle"}}, 
+                             {"s11_4_c", 1, {"ACM0/light/hallway/downstairs/entrance/toggle"}}, 
+                             {"s11_4_d", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, 
+                             {"s11_7_a", 1, {"ACM0/light/outside/garage/toggle"}}, 
+                             {"s11_7_b", 1, {"ACM0/light/outside/porch/toggle"}}
+                         }, 
+     BUTTONS_TOTAL},
+    {"A15", &buttonsA15, {
+                             {}, 
+                             {"s10_6_a", 1, {"ACM0/light/kitchen/dining/toggle"}}, 
+                             {"s10_6_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, 
+                             {"s10_6_c", 1, {"ACM0/light/kitchen/island/toggle"}}, 
+                             {"s10_6_d", 1, {"ACM0/light/kitchen/fridge/toggle"}}, 
+                             {"s11_6_a", 1, {"ACM0/light/outside/door/toggle"}}, 
+                             {"s11_6_b", 1, {"ACM0/light/outside/garage/toggle"}}
+                         }, 
+     BUTTONS_TOTAL}};
 
 // ---------------------------------------------------------------------------------
 // PUSH BUTTONS SETUP
@@ -140,11 +194,11 @@ c_output c_outputs[OUTPUTS_TOTAL] = {
     {"el_68", CONTROLLINO_D15, "light/hallway/stairs/led"},
     {"el_65", CONTROLLINO_D13, "light/living_room/led/tv"},
     {"el_67", CONTROLLINO_D14, "light/living_room/center"},
-    {"el_71", CONTROLLINO_D16, "light/living_room/1"},
-    {"el_72", CONTROLLINO_D17, "light/living_room/2"},
-    {"el_73", CONTROLLINO_D18, "light/living_room/3"},
-    {"el_74", CONTROLLINO_D19, "light/living_room/4"},
-    {"el_75", CONTROLLINO_D20, "light/living_room/5"},
+    {"el_71", CONTROLLINO_D16, "light/living_room/one"},
+    {"el_72", CONTROLLINO_D17, "light/living_room/two"},
+    {"el_73", CONTROLLINO_D18, "light/living_room/three"},
+    {"el_74", CONTROLLINO_D19, "light/living_room/four"},
+    {"el_75", CONTROLLINO_D20, "light/living_room/five"},
     {"el_76", CONTROLLINO_D21, "light/outside/door"},
     {"el_77", CONTROLLINO_D22, "light/outside/garage"},
     {"el_78", CONTROLLINO_D23, "light/outside/porch"}};
