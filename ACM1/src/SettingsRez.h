@@ -104,7 +104,6 @@ typedef struct p_btn
 p_btn p_button[] = {
     {"s10_1_in0", PushButton(CONTROLLINO_IN0, PRESSED_WHEN_HIGH), 1, {"ACM0/light/guest_room/toggle"}},
     {"s10_1_in1", PushButton(CONTROLLINO_IN1, PRESSED_WHEN_HIGH), 1, {"ACM0/light/tech_room/toggle"}},
-    //{"", PushButton(CONTROLLINO_A5, PRESSED_WHEN_HIGH), 1 {""}},
     {"s11_3_a8", PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH), 1, {"ACM0/light/pantry/toggle"}},
     {"s11_2_a9", PushButton(CONTROLLINO_A9, PRESSED_WHEN_HIGH), 1, {"ACM0/light/bathroom/downstairs/mirror/toggle"}},
     {"s11_1_a10", PushButton(CONTROLLINO_A10, PRESSED_WHEN_HIGH), 1, {"ACM0/light/bathroom/downstairs/main/toggle"}},
@@ -120,7 +119,7 @@ p_btn p_button[] = {
 const int PUSH_BUTTONS_TOTAL = 13;
 
 // ---------------------------------------------------------------------------------
-// OUTPUT DEFINITION
+// OUTPUT DEFINITION - without blinds
 // ---------------------------------------------------------------------------------
 
 const int OUTPUTS_TOTAL = 23;
@@ -148,13 +147,7 @@ c_output c_outputs[OUTPUTS_TOTAL] = {
     {"el_80", CONTROLLINO_D10, "light/toilet/upstairs/mirror"},
     {"el_81", CONTROLLINO_D11, "light/toilet/upstairs/main"},
     {"el_x34", CONTROLLINO_R14, "outlet/bathroom/downstairs"},
-    {"el_x35", CONTROLLINO_R15, "outlet/bathroom/upstairs"},
-    {"el_z1", CONTROLLINO_R2, "blind/parents"},
-    {"el_z2", CONTROLLINO_R4, "blind/hallway/upstairs"},
-    {"el_z3", CONTROLLINO_R6, "blind/adka"},
-    {"el_z4", CONTROLLINO_R8, "blind/misko"},
-    {"el_z5", CONTROLLINO_R10, "blind/kitchen"},
-    {"el_z6", CONTROLLINO_R12, "blind/living_room"}};
+    {"el_x35", CONTROLLINO_R15, "outlet/bathroom/upstairs"}};
 
 // ---------------------------------------------------------------------------------
 // BLINDS SETUP
@@ -171,7 +164,6 @@ Shutters detska2;
 Shutters kuchyna;
 Shutters obyvacka;
 
-// take on struct
 typedef struct c_blind
 {
     const char *name;

@@ -134,9 +134,10 @@ void onShuttersLevelReached(Shutters *shutters, byte level)
 /* New shutter code end */
 
 // main toggle function for lights (and others)
-void toggle(int pin)
+int toggle(int pin)
 {
     digitalWrite(pin, !digitalRead(pin));
+    return digitalRead(pin);
 }
 
 // Helper function to find which output to choose for the topic received
@@ -231,12 +232,10 @@ void callback(char *topic, byte *payload, unsigned int length)
         if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
         {
             // Get the pin by the entity
-            int foundPin = returnPin(topicStr.substring(5, topicStr.length() - String("/toggle").length()));
+            int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
 
-            // Toggle the pin value
-            toggle(foundPin);
-            // Publish the state to the state topic
-            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
+            // Toggle the pin and publish the state to the state topic
+            client.publish(stateTopic, toggle(foundPin) == HIGH ? "on" : "off", retain);
             // ... and resubscribe
             client.subscribe(controllino);
         }
@@ -263,10 +262,10 @@ void callback(char *topic, byte *payload, unsigned int length)
         (*shutB).setLevel(percentage);
     }
 
-    if (topicStr.indexOf("info") == 0)
+    if (topicStr.indexOf("info") >= 0)
     {
-        Serial.println("ACM0 reconnected...'info' command received.");
-        client.publish("ACM0/info_done", "info accomplished");
+        Serial.println("ACM1 reconnected...'info' command received.");
+        client.publish("ACM1/info_done", "info accomplished");
         // ... and resubscribe
         client.subscribe(controllino);
     }
@@ -370,6 +369,12 @@ void setup()
     {
         pinMode(blinds[pM].pin, OUTPUT);
         pinMode(blinds[pM].pin + 1, OUTPUT);
+    }
+
+    //initialitze pinMode for all Outputs
+    for (int pMo = 0; pMo < OUTPUTS_TOTAL; pMo++)
+    {
+        pinMode(c_outputs[pMo].pin, OUTPUT);
     }
 }
 

@@ -19,9 +19,10 @@ PubSubClient client(ethClient);
 long lastReconnectAttempt = 0;
 
 // main toggle function for lights (and others)
-void toggle(int pin)
+int toggle(int pin)
 {
     digitalWrite(pin, !digitalRead(pin));
+    return digitalRead(pin);
 }
 
 // Helper function to find which output to choose for the topic received
@@ -76,7 +77,7 @@ void callback(char *topic, byte *payload, unsigned int length)
         if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
         {
             // Get the pin by the entity
-            int foundPin = returnPin(topicStr.substring(5, topicStr.length() - String("/cmd").length()));
+            int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
 
             // Check if request is to turn on and currently is off
             if (message.compareTo("on") == 0 && digitalRead(foundPin) == LOW)
@@ -113,18 +114,16 @@ void callback(char *topic, byte *payload, unsigned int length)
         if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
         {
             // Get the pin by the entity
-            int foundPin = returnPin(topicStr.substring(5, topicStr.length() - String("/toggle").length()));
+            int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
 
-            // Toggle the pin value
-            toggle(foundPin);
-            // Publish the state to the state topic
-            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
+            // Toggle the pin value and Publish the state to the state topic
+            client.publish(stateTopic, toggle(foundPin) == HIGH ? "on" : "off", retain);
             // ... and resubscribe
             client.subscribe(controllino);
         };
     }
 
-    if (topicStr.indexOf("info") == 0)
+    if (topicStr.indexOf("info") >= 0)
     {
         Serial.println("ACM0 reconnected...'info' command received.");
         client.publish("ACM0/info_done", "info accomplished");
@@ -197,6 +196,12 @@ void setup()
     for (int p2 = 0; p2 < PUSH_BUTTONS_TOTAL; p2++)
     {
         p_button[p2].definition.onPress(checkPressedPushButton);
+    }
+    
+    //initialitze pinMode for all Outputs
+    for (int pMo = 0; pMo < OUTPUTS_TOTAL; pMo++)
+    {
+        pinMode(c_outputs[pMo].pin, OUTPUT);
     }
 }
 
