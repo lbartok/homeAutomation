@@ -85,8 +85,8 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
                            {"s13_7_b", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}}, 
                            {"s13_7_c", 1, {"ACM1/blind/misko/cmd"}, "close"}, 
                            {"s13_7_d", 1, {"ACM1/blind/misko/cmd"}, "open"}, 
-                           {"s13_1_a", 1, {"ACM1/light/parents/main/toggle"}}, 
-                           {"s13_1_b", 1, {"ACM1/light/parents/mom/toggle"}}
+                           {"s13_1_a", 1, {"ACM1/light/parents/mom/toggle"}}, 
+                           {"s13_1_b", 1, {"ACM1/light/parents/main/toggle"}}
                        }, 
      BUTTONS_TOTAL},
     {"A2", &buttonsA2, {

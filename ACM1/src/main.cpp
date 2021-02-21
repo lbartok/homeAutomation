@@ -265,7 +265,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (topicStr.indexOf("info") >= 0)
     {
         Serial.println("ACM1 reconnected...'info' command received.");
-        client.publish("ACM1/info_done", "info accomplished");
+        client.publish("ACM1/reconnected", "info accomplished");
         // ... and resubscribe
         client.subscribe(controllino);
     }
@@ -277,7 +277,7 @@ boolean reconnect()
     if (client.connect("deviceACM1"))
     {
         // Once connected, publish an announcement...
-        client.publish("ACM1/info", "{\"action\":\"info\"}");
+        client.publish("ACM1/info", "reconnected");
         // ... and resubscribe
         client.subscribe(controllino);
     }
