@@ -51,7 +51,7 @@ typedef struct SubButton
 {
     const char *name;
     int total_topics;
-    const char *topics[2];
+    const char *topics[3];
     const char *payload;
 } SubButton;
 
@@ -66,7 +66,7 @@ typedef struct AmB
 AmB am_button[ANALOG_BUTTONS_TOTAL] = {
     {"A6", &buttonsA6, {
                            {},
-                           {"s10_5_a", 1, {"ACM0/light/kitchen/island/toggle"}},
+                           {"s10_5_a", 2, {"ACM0/light/kitchen/island/toggle", "ACM0/light/kitchen/led/toggle"}},
                            {"s10_5_b", 1, {"ACM0/light/kitchen/fridge/toggle"}},
                            {"s10_5_c", 1, {"ACM1/blind/kitchen/cmd"}, "open"},
                            {"s10_5_d", 1, {"ACM1/blind/kitchen/cmd"}, "close"},
@@ -75,16 +75,15 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
                        },
      BUTTONS_TOTAL},
     {"A7", &buttonsA7, {
-                           {}, 
-                           {"s10_3_a", 2, {"ACM0/light/living_room/hallway/toggle", "ACM0/light/living_room/center/toggle"}}, 
-                           {"s10_3_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}}, 
-                           {"s10_3_c", 1, {"ACM1/blind/living_room/cmd"}, "close"}, 
-                           {"s10_3_d", 1, {"ACM1/blind/living_room/cmd"}, "open"}, 
-                           {"s10_3_e", 1, {"ACM0/light/outside/porch/toggle"}}, 
-                           {"s10_3_f", 2, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle"}}
-                        }, 
-     BUTTONS_TOTAL}
-    };
+                           {},
+                           {"s10_3_a", 2, {"ACM0/light/living_room/hallway/toggle", "ACM0/light/living_room/center/toggle"}},
+                           {"s10_3_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}},
+                           {"s10_3_c", 1, {"ACM1/blind/living_room/cmd"}, "close"},
+                           {"s10_3_d", 1, {"ACM1/blind/living_room/cmd"}, "open"},
+                           {"s10_3_e", 1, {"ACM0/light/outside/porch/toggle"}},
+                           {"s10_3_f", 3, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle", "ACM0/light/kitchen/led/toggle"}},
+                       },
+     BUTTONS_TOTAL}};
 
 // ---------------------------------------------------------------------------------
 // PUSH BUTTONS SETUP
@@ -96,7 +95,7 @@ typedef struct p_btn
     const char *name;
     PushButton definition;
     int total_topics;
-    const char *topics[2];
+    const char *topics[3];
     const char *payload;
 } p_btn;
 
@@ -107,8 +106,8 @@ p_btn p_button[] = {
     {"s11_3_a8", PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH), 1, {"ACM0/light/pantry/toggle"}},
     {"s11_2_a9", PushButton(CONTROLLINO_A9, PRESSED_WHEN_HIGH), 1, {"ACM0/light/bathroom/downstairs/mirror/toggle"}},
     {"s11_1_a10", PushButton(CONTROLLINO_A10, PRESSED_WHEN_HIGH), 1, {"ACM0/light/bathroom/downstairs/main/toggle"}},
-    {"s10_8_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 2, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle"}},
-    {"s10_7_a12", PushButton(CONTROLLINO_A12, PRESSED_WHEN_HIGH), 2, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle"}},
+    {"s10_8_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 1, {"ACM0/light/kitchen/island/toggle"}},
+    {"s10_7_a12", PushButton(CONTROLLINO_A12, PRESSED_WHEN_HIGH), 1, {"ACM0/light/kitchen/led/toggle"}},
     {"s10_4_f", PushButton(CONTROLLINO_A13, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/four/toggle"}},
     {"s10_4_d", PushButton(CONTROLLINO_A14, PRESSED_WHEN_HIGH), 1, {"ACM0/light/hallway/stairs/led/toggle"}},
     {"s10_4_a", PushButton(CONTROLLINO_A15, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/one/toggle"}},
@@ -147,7 +146,8 @@ c_output c_outputs[OUTPUTS_TOTAL] = {
     {"el_80", CONTROLLINO_D10, "light/toilet/upstairs/mirror"},
     {"el_81", CONTROLLINO_D11, "light/toilet/upstairs/main"},
     {"el_x34", CONTROLLINO_R14, "outlet/bathroom/downstairs"},
-    {"el_x35", CONTROLLINO_R15, "outlet/bathroom/upstairs"}};
+    {"el_x35", CONTROLLINO_R15, "outlet/bathroom/upstairs"},
+    {"el_z30", CONTROLLINO_D23, "lock/outside/gate"}};
 
 // ---------------------------------------------------------------------------------
 // BLINDS SETUP
