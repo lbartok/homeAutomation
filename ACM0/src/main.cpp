@@ -74,7 +74,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (topicStr.lastIndexOf("cmd") >= 0)
     {
         // Check the type to know what to do (light/outlet/blind)
-        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
+        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0 || topicStr.indexOf("lock") >= 0)
         {
             // Get the pin by the entity
             int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
@@ -111,7 +111,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (topicStr.lastIndexOf("toggle") >= 0)
     {
         // Check the type to know what to do (light/outlet/blind)
-        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
+        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0 || topicStr.indexOf("lock") >= 0)
         {
             // Get the pin by the entity
             int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
@@ -197,7 +197,7 @@ void setup()
     {
         p_button[p2].definition.onPress(checkPressedPushButton);
     }
-    
+
     //initialitze pinMode for all Outputs
     for (int pMo = 0; pMo < OUTPUTS_TOTAL; pMo++)
     {

@@ -169,7 +169,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     // Preserve topic as a String for future checks
     topicStr.concat(topic);
     // Prepare temp topic to convert later to const char * for publishing
-    stateTopicTemp.concat(topicStr.substring(0,topicStr.lastIndexOf("/")));
+    stateTopicTemp.concat(topicStr.substring(0, topicStr.lastIndexOf("/")));
     stateTopicTemp.concat("/state");
     const char *stateTopic = stateTopicTemp.c_str();
 
@@ -177,7 +177,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     if (topicStr.lastIndexOf("cmd") >= 0)
     {
         // Check the type to know what to do (light/outlet/blind)
-        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
+        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0 || topicStr.indexOf("lock") >= 0)
         {
             // Get the pin by the entity
             int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
@@ -194,16 +194,16 @@ void callback(char *topic, byte *payload, unsigned int length)
             // ... and resubscribe
             client.subscribe(controllino);
         }
-        else if (topicStr.indexOf("blind") >= 0) 
+        else if (topicStr.indexOf("blind") >= 0)
         {
             // set the blind to work with
             Shutters *shutB = resolveShutter(topicStr.substring(5, topicStr.lastIndexOf("/")));
 
             // need to convert message received: "open" => 0 (all the way up), "close" => 100 (all the way down)
             // "stop" => ehm stop... (switches do not have STOP button, hence the special handling)
-            
+
             // check whether the blind is running when button has been pressed again
-            if (message.equalsIgnoreCase("stop")) 
+            if (message.equalsIgnoreCase("stop"))
             {
                 (*shutB).stop();
             }
@@ -229,7 +229,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     else if (topicStr.lastIndexOf("toggle") >= 0)
     {
         // Check the type to know what to do (light/outlet/blind)
-        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0)
+        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0 || topicStr.indexOf("lock") >= 0)
         {
             // Get the pin by the entity
             int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));

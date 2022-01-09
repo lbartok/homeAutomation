@@ -121,8 +121,8 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
      BUTTONS_TOTAL},
     {"A14", &buttonsA14, {
                              {},
-                             {"s11_4_a", 1, {"ACM0/light/outside/garage/toggle"}},
-                             {"s11_4_b", 1, {"ACM0/light/outside/door/toggle"}},
+                             {"s11_4_a", 1, {"ACM0/light/outside/door/toggle"}},
+                             {"s11_4_b", 1, {"ACM1/lock/outside/gate/toggle"}},
                              {"s11_4_c", 1, {"ACM0/light/hallway/downstairs/entrance/toggle"}},
                              {"s11_4_d", 1, {"ACM0/light/hallway/downstairs/main/toggle"}},
                              {"s11_7_a", 1, {"ACM0/light/outside/garage/toggle"}},
