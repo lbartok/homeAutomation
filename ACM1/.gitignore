@@ -6,4 +6,5 @@
 .vscode/launch.json
 .vscode
 .gitignore
+acm1_setup.h
 *.code-workspace
