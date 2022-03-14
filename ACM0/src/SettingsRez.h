@@ -2,26 +2,18 @@
  * SettingsRez.h
  * A library to capture variables and settings for homeAutomation for "rez".
  * Controllino ACM0
-*/
+ */
 
 #ifndef SETTINGS_REZ_H
 #define SETTINGS_REZ_H
 
+#include "acm0_setup.h"
 #include <Controllino.h>
 // For analog button detection
 #include "AnalogMultiButton.h"
 // For pushing digital buttons
 #include <Button.h>
 #include <PushButton.h>
-
-// ---------------------------------------------------------------------------------
-// MQTT setup
-// ---------------------------------------------------------------------------------
-byte mac[] = {0xDE, 0xED, 0xBB, 0xFE, 0xAF, 0xAA};
-IPAddress ip(192, 168, 69, 181);
-IPAddress server(192, 168, 69, 10);
-const char *controllino = "ACM0/#";
-boolean retain = true;
 
 // ---------------------------------------------------------------------------------
 // ANALOG BUTTONS SETUP
@@ -71,18 +63,18 @@ typedef struct AmB
 AmB am_button[ANALOG_BUTTONS_TOTAL] = {
     {"A0", &buttonsA0, {
                            {},
-                           {"s13_8_a", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}},
-                           {"s13_8_b", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}},
-                           {"s13_8_c", 1, {"ACM1/blind/adka/cmd"}, "close"},
-                           {"s13_8_d", 1, {"ACM1/blind/adka/cmd"}, "open"},
+                           {"s13_8_a", 2, {"NR/light/misko/toggle"}},
+                           {"s13_8_b", 2, {"NR/light/adka/toggle"}},
+                           {"s13_8_c", 1, {"ACM1/blind/adka/cmd"}, "open"},
+                           {"s13_8_d", 1, {"ACM1/blind/adka/cmd"}, "close"},
                            {"s13_2_a", 1, {"ACM1/light/parents/main/toggle"}},
                            {"s13_2_b", 1, {"ACM1/light/parents/dad/toggle"}},
                        },
      BUTTONS_TOTAL},
     {"A1", &buttonsA1, {
                            {},
-                           {"s13_7_a", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}},
-                           {"s13_7_b", 2, {"ACM1/light/adka/toggle", "ACM1/light/misko/toggle"}},
+                           {"s13_7_a", 2, {"NR/light/misko/toggle"}},
+                           {"s13_7_b", 2, {"NR/light/adka/toggle"}},
                            {"s13_7_c", 1, {"ACM1/blind/misko/cmd"}, "close"},
                            {"s13_7_d", 1, {"ACM1/blind/misko/cmd"}, "open"},
                            {"s13_1_a", 1, {"ACM1/light/parents/mom/toggle"}},
@@ -111,7 +103,7 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
      BUTTONS_TOTAL},
     {"A13", &buttonsA13, {
                              {},
-                             {"s12_2_a", 1, {"ACM1/light/toilet/upstairs/main/toggle"}},
+                             {"s12_2_a", 1, {"ACM1/light/toilet/upstairs/mirror/toggle"}},
                              {"s12_2_b", 1, {"ACM1/light/toilet/upstairs/main/toggle"}},
                              {"s13_3_a", 1, {"ACM1/blind/parents/cmd"}, "close"},
                              {"s13_3_b", 1, {"ACM1/blind/parents/cmd"}, "open"},

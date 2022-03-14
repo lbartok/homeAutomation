@@ -2,26 +2,18 @@
  * SettingsRez.h
  * A library to capture variables and settings for homeAutomation for "rez".
  * Controllino ACM1
-*/
+ */
 
 #ifndef SETTINGS_REZ_H
 #define SETTINGS_REZ_H
 
+#include "acm1_setup.h"
 #include <Controllino.h>
 // For analog button detection
 #include "AnalogMultiButton.h"
 // For pushing digital buttons
 #include <Button.h>
 #include <PushButton.h>
-
-// ---------------------------------------------------------------------------------
-// MQTT setup
-// ---------------------------------------------------------------------------------
-byte mac[] = {0xDE, 0xED, 0xBB, 0xFE, 0xAF, 0xBB};
-IPAddress ip(192, 168, 69, 180);
-IPAddress server(192, 168, 69, 10);
-const char *controllino = "ACM1/#";
-boolean retain = true;
 
 // ---------------------------------------------------------------------------------
 // ANALOG BUTTONS SETUP

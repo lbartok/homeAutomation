@@ -5,3 +5,6 @@
 .vscode/c_cpp_properties.json
 .vscode/launch.json
 .vscode
+.gitignore
+acm0_setup.h
+*.code-workspace
