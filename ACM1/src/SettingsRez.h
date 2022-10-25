@@ -100,12 +100,12 @@ p_btn p_button[] = {
     {"s11_1_a10", PushButton(CONTROLLINO_A10, PRESSED_WHEN_HIGH), 1, {"ACM0/light/bathroom/downstairs/main/toggle"}},
     {"s10_8_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 1, {"ACM0/light/kitchen/island/toggle"}},
     {"s10_7_a12", PushButton(CONTROLLINO_A12, PRESSED_WHEN_HIGH), 1, {"ACM0/light/kitchen/led/toggle"}},
-    {"s10_4_f", PushButton(CONTROLLINO_A13, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/four/toggle"}},
+    {"s10_4_f", PushButton(CONTROLLINO_A13, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/three/toggle"}},
     {"s10_4_d", PushButton(CONTROLLINO_A14, PRESSED_WHEN_HIGH), 1, {"ACM0/light/hallway/stairs/led/toggle"}},
-    {"s10_4_a", PushButton(CONTROLLINO_A15, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/one/toggle"}},
-    {"s10_4_b", PushButton(CONTROLLINO_I16, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/two/toggle"}},
-    {"s10_4_c", PushButton(CONTROLLINO_I17, PRESSED_WHEN_HIGH), 1, {"ACM1/light/hallway/stairs/above/toggle"}},
-    {"s10_4_e", PushButton(CONTROLLINO_I18, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/three/toggle"}}};
+    {"s10_4_a", PushButton(CONTROLLINO_A15, PRESSED_WHEN_HIGH), 1, {"ACM1/light/hallway/stairs/above/toggle"}},
+    {"s10_4_b", PushButton(CONTROLLINO_I16, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/four/toggle"}},
+    {"s10_4_c", PushButton(CONTROLLINO_I17, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/two/toggle"}},
+    {"s10_4_e", PushButton(CONTROLLINO_I18, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/one/toggle"}}};
 
 const int PUSH_BUTTONS_TOTAL = 13;
 
@@ -113,7 +113,7 @@ const int PUSH_BUTTONS_TOTAL = 13;
 // OUTPUT DEFINITION - without blinds
 // ---------------------------------------------------------------------------------
 
-const int OUTPUTS_TOTAL = 23;
+const int OUTPUTS_TOTAL = 18;
 typedef struct c_output
 {
     const char *name;
@@ -139,7 +139,7 @@ c_output c_outputs[OUTPUTS_TOTAL] = {
     {"el_81", CONTROLLINO_D11, "light/toilet/upstairs/main"},
     {"el_x34", CONTROLLINO_R14, "outlet/bathroom/downstairs"},
     {"el_x35", CONTROLLINO_R15, "outlet/bathroom/upstairs"},
-    {"el_z30", CONTROLLINO_D23, "lock/outside/gate"}};
+    {"el_z30", CONTROLLINO_D22, "lock/outside/gate"}};
 
 // ---------------------------------------------------------------------------------
 // BLINDS SETUP
