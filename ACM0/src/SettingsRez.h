@@ -95,8 +95,8 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
                            {},
                            {"s13_4_a", 1, {"ACM1/light/hallway/upstairs/toggle"}},
                            {"s13_4_b", 1, {"ACM1/light/hallway/stairs/above/toggle"}},
-                           {"s13_4_c", 1, {"ACM1/blind/hallway/upstairs/cmd"}, "close"},
-                           {"s13_4_d", 1, {"ACM1/blind/hallway/upstairs/cmd"}, "open"},
+                           {"s13_4_c", 1, {"ACM1/blind/hallway/upstairs/cmd"}, "open"},
+                           {"s13_4_d", 1, {"ACM1/blind/hallway/upstairs/cmd"}, "close"},
                            {"s12_6_a", 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
                            {"s12_6_b", 1, {"ACM1/light/closet/main/toggle"}},
                        },
@@ -150,8 +150,8 @@ typedef struct p_btn
 p_btn p_button[] = {
     {"s13_5_a5", PushButton(CONTROLLINO_A5, PRESSED_WHEN_HIGH), 1, {"ACM1/light/hallway/upstairs/toggle"}},
     {"s12_7_a6", PushButton(CONTROLLINO_A6, PRESSED_WHEN_HIGH), 1, {"ACM1/light/closet/led/toggle"}},
-    {"s12_5_a7", PushButton(CONTROLLINO_A7, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
-    {"s12_4_a8", PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
+    {"s12_5_a7", PushButton(CONTROLLINO_A7, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/mirror/mom/toggle"}},
+    {"s12_4_a8", PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/mirror/dad/toggle"}},
     {"s12_3_a9", PushButton(CONTROLLINO_A9, PRESSED_WHEN_HIGH), 1, {"ACM1/light/bathroom/upstairs/main/toggle"}},
     {"s11_5_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 1, {"ACM0/light/outside/door/toggle"}},
 };

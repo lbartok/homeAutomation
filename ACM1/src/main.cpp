@@ -14,6 +14,7 @@
 // New shutter code
 #include <Shutters.h>
 #include <EEPROM.h>
+#include <avr/wdt.h>
 
 // settings for individual home
 #include <SettingsRez.h>
@@ -51,11 +52,30 @@ int resolveShutterPin(Shutters *s)
     return -1;
 }
 
+// Function to return blind's entity identifier by supplying Shutter refference
+String resolveShutterEntity(Shutters *s)
+{
+    for (int s0 = 0; s0 < BLINDS_TOTAL; s0++)
+    {
+        if (s == blinds[s0].blind)
+        {
+            // this callback was called from the blindsArray[s0]
+            return blinds[s0].entity;
+        }
+    }
+
+    return "";
+}
+
 // Main function handling operation of each shutter
 void shuttersOperationHandler(Shutters *s, ShuttersOperation operation)
 {
     controllPin = resolveShutterPin(s);
     directionPin = controllPin + 1;
+    // construct state topic to report blind state
+    String stateTpc = "ACM1/";
+    stateTpc += resolveShutterEntity(s);
+    stateTpc += "/state";
 
     switch (operation)
     {
@@ -64,12 +84,18 @@ void shuttersOperationHandler(Shutters *s, ShuttersOperation operation)
         // Code for the shutters to go up
         digitalWrite(directionPin, LOW);
         digitalWrite(controllPin, HIGH);
+        // State handling for MQTT
+        client.publish(stateTpc.c_str(), "opening", retain);
+        client.subscribe(controllino);
         break;
     case ShuttersOperation::DOWN:
         Serial.println("Shutters going down.");
         // Code for the shutters to go down
         digitalWrite(directionPin, HIGH);
         digitalWrite(controllPin, HIGH);
+        // State handling for MQTT
+        client.publish(stateTpc.c_str(), "closing", retain);
+        client.subscribe(controllino);
         break;
     case ShuttersOperation::HALT:
         Serial.println("Shutters halting.");
@@ -101,20 +127,6 @@ void shuttersWriteStateHandler(Shutters *shutters, const char *state, byte lengt
     }
 }
 
-String resolveShutterEntity(Shutters *s)
-{
-    for (int s0 = 0; s0 < BLINDS_TOTAL; s0++)
-    {
-        if (s == blinds[s0].blind)
-        {
-            // this callback was called from the blindsArray[s0]
-            return blinds[s0].entity;
-        }
-    }
-
-    return "";
-}
-
 // Shutters level reached code to announce each whole percent
 void onShuttersLevelReached(Shutters *shutters, byte level)
 {
@@ -124,9 +136,14 @@ void onShuttersLevelReached(Shutters *shutters, byte level)
         String stateTopic = "ACM1/";
         stateTopic += resolveShutterEntity(shutters);
         stateTopic += "/state";
+        // construct position topic to report blind state
+        String posTopic = "ACM1/";
+        posTopic += resolveShutterEntity(shutters);
+        posTopic += "/pos";
 
-        // publish state
-        client.publish(stateTopic.c_str(), String(level).c_str(), retain);
+        // publish state and position
+        client.publish(stateTopic.c_str(), String(level < 100 ? "open" : "closed").c_str(), retain);
+        client.publish(posTopic.c_str(), String(level).c_str(), retain);
         // ... resubscribe
         client.subscribe(controllino);
     }
@@ -203,11 +220,7 @@ void callback(char *topic, byte *payload, unsigned int length)
             // "stop" => ehm stop... (switches do not have STOP button, hence the special handling)
 
             // check whether the blind is running when button has been pressed again
-            if (message.equalsIgnoreCase("stop"))
-            {
-                (*shutB).stop();
-            }
-            else if (!(*shutB).isIdle() && (message.equalsIgnoreCase("open") || message.equalsIgnoreCase("close")))
+            if (message.equalsIgnoreCase("stop") || !(*shutB).isIdle())
             {
                 (*shutB).stop();
             }
@@ -314,6 +327,9 @@ void setup()
     // begin serial so we can see which buttons are being pressed through the serial monitor
     Serial.begin(9600);
 
+    /* Setup WatchDog timer */
+    wdt_enable(WDTO_4S);
+
     /* New shutters code */
     delay(100);
 #ifdef ESP8266
@@ -371,7 +387,7 @@ void setup()
         pinMode(blinds[pM].pin + 1, OUTPUT);
     }
 
-    //initialitze pinMode for all Outputs
+    // initialitze pinMode for all Outputs
     for (int pMo = 0; pMo < OUTPUTS_TOTAL; pMo++)
     {
         pinMode(c_outputs[pMo].pin, OUTPUT);
@@ -434,6 +450,9 @@ void loop()
         // Client connected
         client.loop();
     }
+
+    /* reset WatchDog timer*/
+    wdt_reset();
 }
 
 // duration reports back how long it has been since the button was originally pressed.
