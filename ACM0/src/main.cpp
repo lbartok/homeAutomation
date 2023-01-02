@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Controllino.h>
+#include <avr/wdt.h>
 // For analog button detection
 #include "AnalogMultiButton.h"
 // For MQTT communication
@@ -11,7 +12,6 @@
 #include <ButtonEventCallback.h>
 #include <PushButton.h>
 #include <Bounce2.h> // https://github.com/thomasfredericks/Bounce-Arduino-Wiring
-#include <avr/wdt.h>
 
 // settings for individual home
 #include <SettingsRez.h>
@@ -136,7 +136,7 @@ void callback(char *topic, byte *payload, unsigned int length)
 
 boolean reconnect()
 {
-    if (client.connect("deviceACM0"))
+    if (client.connect("ACM0", user, password))
     {
         // Once connected, publish an announcement...
         client.publish("ACM0/info", "reconnected");
@@ -181,7 +181,7 @@ void setup()
     wdt_enable(WDTO_4S);
 
     // create MQTT
-    client.setServer(server, 1883);
+    client.setServer(server, port);
     client.setCallback(callback);
 
     client.subscribe(controllino);

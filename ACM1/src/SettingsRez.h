@@ -14,6 +14,8 @@
 // For pushing digital buttons
 #include <Button.h>
 #include <PushButton.h>
+// New shutter code
+#include <Shutters.h>
 
 // ---------------------------------------------------------------------------------
 // ANALOG BUTTONS SETUP

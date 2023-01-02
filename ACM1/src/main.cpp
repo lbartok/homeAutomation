@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Controllino.h>
+#include <avr/wdt.h>
 // For analog button detection
 #include "AnalogMultiButton.h"
 // For MQTT communication
@@ -14,7 +15,6 @@
 // New shutter code
 #include <Shutters.h>
 #include <EEPROM.h>
-#include <avr/wdt.h>
 
 // settings for individual home
 #include <SettingsRez.h>
@@ -287,7 +287,7 @@ void callback(char *topic, byte *payload, unsigned int length)
 boolean reconnect()
 {
     // Serial.println("Attempting deviceACM1 - MQTT connection ...");
-    if (client.connect("deviceACM1"))
+    if (client.connect("ACM1", user, password))
     {
         // Once connected, publish an announcement...
         client.publish("ACM1/info", "reconnected");
@@ -340,7 +340,7 @@ void setup()
     Serial.println("Init");
 
     // create MQTT
-    client.setServer(server, 1883);
+    client.setServer(server, port);
     client.setCallback(callback);
 
     client.subscribe(controllino);
