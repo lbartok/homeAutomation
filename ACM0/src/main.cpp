@@ -11,6 +11,8 @@
 #include <ButtonEventCallback.h>
 #include <PushButton.h>
 #include <Bounce2.h> // https://github.com/thomasfredericks/Bounce-Arduino-Wiring
+#include <avr/wdt.h>
+
 // settings for individual home
 #include <SettingsRez.h>
 
@@ -175,6 +177,9 @@ void setup()
     Serial.begin(9600);
     Serial.println("Init");
 
+    /* Setup WatchDog timer */
+    wdt_enable(WDTO_4S);
+
     // create MQTT
     client.setServer(server, 1883);
     client.setCallback(callback);
@@ -198,7 +203,7 @@ void setup()
         p_button[p2].definition.onPress(checkPressedPushButton);
     }
 
-    //initialitze pinMode for all Outputs
+    // initialitze pinMode for all Outputs
     for (int pMo = 0; pMo < OUTPUTS_TOTAL; pMo++)
     {
         pinMode(c_outputs[pMo].pin, OUTPUT);
@@ -262,6 +267,9 @@ void loop()
         // Client connected
         client.loop();
     }
+
+    /* reset Watchdog timer */
+    wdt_reset();
 }
 
 // duration reports back how long it has been since the button was originally pressed.

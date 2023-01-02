@@ -14,6 +14,7 @@
 // New shutter code
 #include <Shutters.h>
 #include <EEPROM.h>
+#include <avr/wdt.h>
 
 // settings for individual home
 #include <SettingsRez.h>
@@ -326,6 +327,9 @@ void setup()
     // begin serial so we can see which buttons are being pressed through the serial monitor
     Serial.begin(9600);
 
+    /* Setup WatchDog timer */
+    wdt_enable(WDTO_4S);
+
     /* New shutters code */
     delay(100);
 #ifdef ESP8266
@@ -446,6 +450,9 @@ void loop()
         // Client connected
         client.loop();
     }
+
+    /* reset WatchDog timer*/
+    wdt_reset();
 }
 
 // duration reports back how long it has been since the button was originally pressed.
