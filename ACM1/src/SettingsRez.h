@@ -14,6 +14,8 @@
 // For pushing digital buttons
 #include <Button.h>
 #include <PushButton.h>
+// New shutter code
+#include <Shutters.h>
 
 // ---------------------------------------------------------------------------------
 // ANALOG BUTTONS SETUP
@@ -58,7 +60,7 @@ typedef struct AmB
 AmB am_button[ANALOG_BUTTONS_TOTAL] = {
     {"A6", &buttonsA6, {
                            {},
-                           {"s10_5_a", 2, {"ACM0/light/kitchen/island/toggle", "ACM0/light/kitchen/led/toggle"}},
+                           {"s10_5_a", 2, {"NR/light/kitchen/island/toggle", "ACM0/light/kitchen/led/toggle"}},
                            {"s10_5_b", 1, {"ACM0/light/kitchen/fridge/toggle"}},
                            {"s10_5_c", 1, {"ACM1/blind/kitchen/cmd"}, "open"},
                            {"s10_5_d", 1, {"ACM1/blind/kitchen/cmd"}, "close"},
@@ -73,7 +75,7 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
                            {"s10_3_c", 1, {"ACM1/blind/living_room/cmd"}, "close"},
                            {"s10_3_d", 1, {"ACM1/blind/living_room/cmd"}, "open"},
                            {"s10_3_e", 1, {"ACM0/light/outside/porch/toggle"}},
-                           {"s10_3_f", 3, {"ACM0/light/kitchen/fridge/toggle", "ACM0/light/kitchen/island/toggle", "ACM0/light/kitchen/led/toggle"}},
+                           {"s10_3_f", 3, {"ACM0/light/kitchen/fridge/toggle", "NR/light/kitchen/island/toggle", "ACM0/light/kitchen/led/toggle"}},
                        },
      BUTTONS_TOTAL}};
 
@@ -97,15 +99,15 @@ p_btn p_button[] = {
     {"s10_1_in1", PushButton(CONTROLLINO_IN1, PRESSED_WHEN_HIGH), 1, {"ACM0/light/tech_room/toggle"}},
     {"s11_3_a8", PushButton(CONTROLLINO_A8, PRESSED_WHEN_HIGH), 1, {"ACM0/light/pantry/toggle"}},
     {"s11_2_a9", PushButton(CONTROLLINO_A9, PRESSED_WHEN_HIGH), 1, {"ACM0/light/bathroom/downstairs/mirror/toggle"}},
-    {"s11_1_a10", PushButton(CONTROLLINO_A10, PRESSED_WHEN_HIGH), 1, {"ACM0/light/bathroom/downstairs/main/toggle"}},
-    {"s10_8_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 1, {"ACM0/light/kitchen/island/toggle"}},
+    {"s11_1_a10", PushButton(CONTROLLINO_A10, PRESSED_WHEN_HIGH), 1, {"NR/light/bathroom/downstairs/main/toggle"}},
+    {"s10_8_a11", PushButton(CONTROLLINO_A11, PRESSED_WHEN_HIGH), 1, {"NR/light/kitchen/island/toggle"}},
     {"s10_7_a12", PushButton(CONTROLLINO_A12, PRESSED_WHEN_HIGH), 1, {"ACM0/light/kitchen/led/toggle"}},
-    {"s10_4_f", PushButton(CONTROLLINO_A13, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/three/toggle"}},
+    {"s10_4_f", PushButton(CONTROLLINO_A13, PRESSED_WHEN_HIGH), 1, {"NR/light/living_room/three/toggle"}},
     {"s10_4_d", PushButton(CONTROLLINO_A14, PRESSED_WHEN_HIGH), 1, {"ACM0/light/hallway/stairs/led/toggle"}},
     {"s10_4_a", PushButton(CONTROLLINO_A15, PRESSED_WHEN_HIGH), 1, {"ACM1/light/hallway/stairs/above/toggle"}},
-    {"s10_4_b", PushButton(CONTROLLINO_I16, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/four/toggle"}},
-    {"s10_4_c", PushButton(CONTROLLINO_I17, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/two/toggle"}},
-    {"s10_4_e", PushButton(CONTROLLINO_I18, PRESSED_WHEN_HIGH), 1, {"ACM0/light/living_room/one/toggle"}}};
+    {"s10_4_b", PushButton(CONTROLLINO_I16, PRESSED_WHEN_HIGH), 1, {"NR/light/living_room/four/toggle"}},
+    {"s10_4_c", PushButton(CONTROLLINO_I17, PRESSED_WHEN_HIGH), 1, {"NR/light/living_room/two/toggle"}},
+    {"s10_4_e", PushButton(CONTROLLINO_I18, PRESSED_WHEN_HIGH), 1, {"NR/light/living_room/one/toggle"}}};
 
 const int PUSH_BUTTONS_TOTAL = 13;
 

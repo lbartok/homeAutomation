@@ -30,7 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Project specific
 ACM1/.vscode/
 ACM0/.vscode/
+.vscode/
+ACM0/test/
+ACM1/test/
 acm0.*
 acm1.*

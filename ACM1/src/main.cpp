@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <Controllino.h>
+#include <avr/wdt.h>
 // For analog button detection
 #include "AnalogMultiButton.h"
 // For MQTT communication
@@ -14,7 +15,6 @@
 // New shutter code
 #include <Shutters.h>
 #include <EEPROM.h>
-#include <avr/wdt.h>
 
 // settings for individual home
 #include <SettingsRez.h>
@@ -193,25 +193,8 @@ void callback(char *topic, byte *payload, unsigned int length)
     // Check the type to know what to do (cmd = hassio | toggle = switch)
     if (topicStr.lastIndexOf("cmd") >= 0)
     {
-        // Check the type to know what to do (light/outlet/blind)
-        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0 || topicStr.indexOf("lock") >= 0)
-        {
-            // Get the pin by the entity
-            int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
-
-            // Check if request is to turn on and currently is off
-            if ((message.equalsIgnoreCase("on") && digitalRead(foundPin) == LOW) || (message.equalsIgnoreCase("off") && digitalRead(foundPin) == HIGH))
-            {
-                // Switch the state
-                toggle(foundPin);
-            }
-
-            // When it is already in desired state, just publish back the state
-            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
-            // ... and resubscribe
-            client.subscribe(controllino);
-        }
-        else if (topicStr.indexOf("blind") >= 0)
+        // Check the type to know what to do (light/outlet/switch/blind)
+        if (topicStr.indexOf("blind") >= 0)
         {
             // set the blind to work with
             Shutters *shutB = resolveShutter(topicStr.substring(5, topicStr.lastIndexOf("/")));
@@ -237,12 +220,29 @@ void callback(char *topic, byte *payload, unsigned int length)
                 Serial.println("I have no idea what you want to do with the blind!");
             }
         }
+        else
+        {
+            // Get the pin by the entity
+            int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
+
+            // Check if request is to turn on and currently is off
+            if ((message.equalsIgnoreCase("on") && digitalRead(foundPin) == LOW) || (message.equalsIgnoreCase("off") && digitalRead(foundPin) == HIGH))
+            {
+                // Switch the state
+                toggle(foundPin);
+            }
+
+            // When it is already in desired state, just publish back the state
+            client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
+            // ... and resubscribe
+            client.subscribe(controllino);
+        }
     }
     // Check the type to know what to do (cmd = hassio | toggle = switch)
     else if (topicStr.lastIndexOf("toggle") >= 0)
     {
         // Check the type to know what to do (light/outlet/blind)
-        if (topicStr.indexOf("light") >= 0 || topicStr.indexOf("outlet") >= 0 || topicStr.indexOf("lock") >= 0)
+        if (topicStr.indexOf("blind") < 0)
         {
             // Get the pin by the entity
             int foundPin = returnPin(topicStr.substring(5, topicStr.lastIndexOf("/")));
@@ -287,7 +287,7 @@ void callback(char *topic, byte *payload, unsigned int length)
 boolean reconnect()
 {
     // Serial.println("Attempting deviceACM1 - MQTT connection ...");
-    if (client.connect("deviceACM1"))
+    if (client.connect("ACM1", user, password))
     {
         // Once connected, publish an announcement...
         client.publish("ACM1/info", "reconnected");
@@ -340,7 +340,7 @@ void setup()
     Serial.println("Init");
 
     // create MQTT
-    client.setServer(server, 1883);
+    client.setServer(server, port);
     client.setCallback(callback);
 
     client.subscribe(controllino);
