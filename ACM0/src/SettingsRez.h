@@ -107,8 +107,8 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
                              {"s12_2_b", 1, {"NR/light/toilet/upstairs/main/toggle"}},
                              {"s13_3_a", 1, {"ACM1/blind/parents/cmd"}, "close"},
                              {"s13_3_b", 1, {"ACM1/blind/parents/cmd"}, "open"},
-                             {"s13_3_c", 1, {"NR/light/parents/main/toggle"}},
-                             {"s13_3_d", 2, {"ACM1/light/parents/mom/toggle", "ACM1/light/parents/dad/toggle"}},
+                             {"s13_3_c", 2, {"ACM1/light/parents/mom/toggle", "ACM1/light/parents/dad/toggle"}},
+                             {"s13_3_d", 1, {"NR/light/parents/main/toggle"}},
                          },
      BUTTONS_TOTAL},
     {"A14", &buttonsA14, {
