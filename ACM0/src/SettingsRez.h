@@ -123,7 +123,7 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
      BUTTONS_TOTAL},
     {"A15", &buttonsA15, {
                              {},
-                             {"s10_6_a", 1, {"ACM0/light/kitchen/dining/toggle"}},
+                             {"s10_6_a", 1, {"NR/light/kitchen/dining/toggle"}},
                              {"s10_6_b", 1, {"ACM0/light/hallway/downstairs/main/toggle"}},
                              {"s10_6_c", 2, {"NR/light/kitchen/island/toggle", "ACM0/light/kitchen/led/toggle"}},
                              {"s10_6_d", 1, {"ACM0/light/kitchen/fridge/toggle"}},
