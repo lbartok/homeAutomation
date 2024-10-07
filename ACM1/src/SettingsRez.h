@@ -65,7 +65,7 @@ AmB am_button[ANALOG_BUTTONS_TOTAL] = {
                            {"s10_5_c", 1, {"ACM1/blind/kitchen/cmd"}, "open"},
                            {"s10_5_d", 1, {"ACM1/blind/kitchen/cmd"}, "close"},
                            {"s10_5_e", 1, {"ACM0/light/hallway/downstairs/main/toggle"}},
-                           {"s10_5_f", 1, {"ACM0/light/kitchen/dining/toggle"}},
+                           {"s10_5_f", 1, {"NR/light/kitchen/dining/toggle"}},
                        },
      BUTTONS_TOTAL},
     {"A7", &buttonsA7, {
@@ -124,23 +124,23 @@ typedef struct c_output
 } c_output;
 
 c_output c_outputs[OUTPUTS_TOTAL] = {
-    {"el_82_83", CONTROLLINO_D0, "light/hallway/upstairs"},
+    {"el_82_83", CONTROLLINO_D0, "switch/hallway/upstairs"},
     {"el_84", CONTROLLINO_D1, "light/hallway/stairs/above"},
     {"el_97", CONTROLLINO_D2, "light/attic"},
-    {"el_86", CONTROLLINO_D3, "light/misko"},
-    {"el_85", CONTROLLINO_D4, "light/adka"},
+    {"el_86", CONTROLLINO_D3, "switch/misko"},
+    {"el_85", CONTROLLINO_D4, "switch/adka"},
     {"el_87_88", CONTROLLINO_D5, "light/closet/main"},
     {"el_98_99", CONTROLLINO_D6, "light/closet/led"},
     {"el_91", CONTROLLINO_D7, "light/parents/dad"},
     {"el_92", CONTROLLINO_D8, "light/parents/mom"},
-    {"el_93", CONTROLLINO_D9, "light/parents/main"},
-    {"el_94", CONTROLLINO_D12, "light/bathroom/upstairs/main"},
+    {"el_93", CONTROLLINO_D9, "switch/parents/main"},
+    {"el_94", CONTROLLINO_D12, "switch/bathroom/upstairs/main"},
     {"el_95", CONTROLLINO_D13, "light/bathroom/upstairs/mirror/mom"},
     {"el_96", CONTROLLINO_D14, "light/bathroom/upstairs/mirror/dad"},
     {"el_80", CONTROLLINO_D10, "light/toilet/upstairs/mirror"},
-    {"el_81", CONTROLLINO_D11, "light/toilet/upstairs/main"},
-    {"el_x34", CONTROLLINO_R14, "outlet/bathroom/downstairs"},
-    {"el_x35", CONTROLLINO_R15, "outlet/bathroom/upstairs"},
+    {"el_81", CONTROLLINO_D11, "switch/toilet/upstairs/main"},
+    {"el_x34", CONTROLLINO_R14, "switch/bathroom/downstairs"},
+    {"el_x35", CONTROLLINO_R15, "switch/bathroom/upstairs"},
     {"el_z30", CONTROLLINO_D22, "lock/outside/gate"}};
 
 // ---------------------------------------------------------------------------------

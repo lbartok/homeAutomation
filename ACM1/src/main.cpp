@@ -73,9 +73,7 @@ void shuttersOperationHandler(Shutters *s, ShuttersOperation operation)
     controllPin = resolveShutterPin(s);
     directionPin = controllPin + 1;
     // construct state topic to report blind state
-    String stateTpc = "ACM1/";
-    stateTpc += resolveShutterEntity(s);
-    stateTpc += "/state";
+    String stateTpc = "ACM1/" + resolveShutterEntity(s) + "/state";
 
     switch (operation)
     {
@@ -86,7 +84,6 @@ void shuttersOperationHandler(Shutters *s, ShuttersOperation operation)
         digitalWrite(controllPin, HIGH);
         // State handling for MQTT
         client.publish(stateTpc.c_str(), "opening", retain);
-        client.subscribe(controllino);
         break;
     case ShuttersOperation::DOWN:
         Serial.println("Shutters going down.");
@@ -95,7 +92,6 @@ void shuttersOperationHandler(Shutters *s, ShuttersOperation operation)
         digitalWrite(controllPin, HIGH);
         // State handling for MQTT
         client.publish(stateTpc.c_str(), "closing", retain);
-        client.subscribe(controllino);
         break;
     case ShuttersOperation::HALT:
         Serial.println("Shutters halting.");
@@ -144,8 +140,20 @@ void onShuttersLevelReached(Shutters *shutters, byte level)
         // publish state and position
         client.publish(stateTopic.c_str(), String(level < 100 ? "open" : "closed").c_str(), retain);
         client.publish(posTopic.c_str(), String(level).c_str(), retain);
-        // ... resubscribe
-        client.subscribe(controllino);
+    }
+
+    if ((int)level%10 == 0) {
+        // construct state topic to report blind state
+        String stateTopic = "ACM1/";
+        stateTopic += resolveShutterEntity(shutters);
+        stateTopic += "/state";
+        // construct position topic to report blind state
+        String posTopic = "ACM1/";
+        posTopic += resolveShutterEntity(shutters);
+        posTopic += "/pos";
+
+        // publish state and position
+        client.publish(posTopic.c_str(), String(level).c_str(), retain);
     }
 }
 /* New shutter code end */
@@ -234,8 +242,6 @@ void callback(char *topic, byte *payload, unsigned int length)
 
             // When it is already in desired state, just publish back the state
             client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
-            // ... and resubscribe
-            client.subscribe(controllino);
         }
     }
     // Check the type to know what to do (cmd = hassio | toggle = switch)
@@ -249,8 +255,6 @@ void callback(char *topic, byte *payload, unsigned int length)
 
             // Toggle the pin and publish the state to the state topic
             client.publish(stateTopic, toggle(foundPin) == HIGH ? "on" : "off", retain);
-            // ... and resubscribe
-            client.subscribe(controllino);
         }
     }
     // when HassIO will set position through slider
@@ -275,24 +279,85 @@ void callback(char *topic, byte *payload, unsigned int length)
         (*shutB).setLevel(percentage);
     }
 
-    if (topicStr.indexOf("info") >= 0)
+    if (topicStr.indexOf(homeassistant) >= 0)
     {
-        Serial.println("ACM1 reconnected...'info' command received.");
-        client.publish("ACM1/reconnected", "info accomplished");
-        // ... and resubscribe
-        client.subscribe(controllino);
+        // Check if it is birth or will message
+        if (message.compareTo("online") == 0) {
+            // birth message received
+            Serial.println("Homeassistant went online.");
+            client.publish("ACM1/HA_status", "HA is online");
+
+            // Publish the states of all the entities
+        for (int ale = 0; ale < OUTPUTS_TOTAL; ale++)
+            {
+                // prepare state topic and payload
+                String aleStateTopic, aleStatePayload;
+                aleStateTopic.concat("ACM1/" + c_outputs[ale].entity + "/state");
+                aleStatePayload.concat(digitalRead(c_outputs[ale].pin) == HIGH ? "on" : "off");
+
+                // publish ...
+                client.publish(aleStateTopic.c_str(), aleStatePayload.c_str());
+            }
+        // Publish the states of all the blinds
+        for (int alb = 0; alb < BLINDS_TOTAL; alb++)
+            {
+                // prepare state, position topic and payload
+                String albStateTopic, albPosTopic, albStatePayload, albPosPayload;
+                Shutters *albShutter = blinds[alb].blind;
+                uint8_t albPosition = (*albShutter).getCurrentLevel();
+                albStateTopic.concat("ACM1/" + blinds[alb].entity + "/state");
+                albPosTopic.concat("ACM1/" + blinds[alb].entity + "/pos");
+                albStatePayload.concat(albPosition < 100 ? "open" : "closed");
+                
+                // publish ...
+                client.publish(albStateTopic.c_str(), albStatePayload.c_str());
+                client.publish(albPosTopic.c_str(), String(albPosition).c_str());
+            }
+
+        } else {
+            // will (or other) message received
+            Serial.println("Homeassistant went offline.");
+            client.publish("ACM1/HA_status", "HA is offline");
+        }
     }
 }
 
 boolean reconnect()
 {
     // Serial.println("Attempting deviceACM1 - MQTT connection ...");
-    if (client.connect("ACM1", user, password))
+    if (client.connect(user, user, password))
     {
         // Once connected, publish an announcement...
         client.publish("ACM1/info", "reconnected");
+        // Publish the states of all the entities
+        for (int ale = 0; ale < OUTPUTS_TOTAL; ale++)
+            {
+                // prepare state topic and payload
+                String aleStateTopic, aleStatePayload;
+                aleStateTopic.concat("ACM1/" + c_outputs[ale].entity + "/state");
+                aleStatePayload.concat(digitalRead(c_outputs[ale].pin) == HIGH ? "on" : "off");
+
+                // publish ...
+                client.publish(aleStateTopic.c_str(), aleStatePayload.c_str());
+            }
+        // Publish the states of all the blinds
+        for (int alb = 0; alb < BLINDS_TOTAL; alb++)
+            {
+                // prepare state, position topic and payload
+                String albStateTopic, albPosTopic, albStatePayload, albPosPayload;
+                Shutters *albShutter = blinds[alb].blind;
+                uint8_t albPosition = (*albShutter).getCurrentLevel();
+                albStateTopic.concat("ACM1/" + blinds[alb].entity + "/state");
+                albPosTopic.concat("ACM1/" + blinds[alb].entity + "/pos");
+                albStatePayload.concat(albPosition < 100 ? "open" : "closed");
+                
+                // publish ...
+                client.publish(albStateTopic.c_str(), albStatePayload.c_str());
+                client.publish(albPosTopic.c_str(), String(albPosition).c_str());
+            }
         // ... and resubscribe
         client.subscribe(controllino);
+        client.subscribe(homeassistant);
     }
     return client.connected();
 }
@@ -315,8 +380,6 @@ void checkPressedButton(Button &btn)
             for (int tt = 0; tt < p_button[p].total_topics; tt++)
             {
                 client.publish(p_button[p].topics[tt], p_button[p].payload);
-                // ... and resubscribe
-                client.subscribe(controllino);
             }
         }
     }
@@ -328,7 +391,7 @@ void setup()
     Serial.begin(9600);
 
     /* Setup WatchDog timer */
-    wdt_enable(WDTO_4S);
+    wdt_enable(WDTO_8S);
 
     /* New shutters code */
     delay(100);
@@ -339,16 +402,14 @@ void setup()
 
     Serial.println("Init");
 
-    // create MQTT
-    client.setServer(server, port);
-    client.setCallback(callback);
-
-    client.subscribe(controllino);
-
     // Setup ethernet
     Ethernet.begin(mac, ip);
     delay(200);
     lastReconnectAttempt = 0;
+
+    // create MQTT
+    client.setServer(server, port);
+    client.setCallback(callback);
 
     // Initialize shutters
     for (int s1 = 0; s1 < BLINDS_TOTAL; s1++)
@@ -424,8 +485,6 @@ void loop()
                 for (int tt = 0; tt < am_button[aB2].buttons[aB].total_topics; tt++)
                 {
                     client.publish(am_button[aB2].buttons[aB].topics[tt], am_button[aB2].buttons[aB].payload);
-                    // ... and resubscribe
-                    client.subscribe(controllino);
                 }
             }
         }

@@ -84,8 +84,6 @@ void callback(char *topic, byte *payload, unsigned int length)
             // Switch the state and publish
             toggle(foundPin);
             client.publish(stateTopic, "on", retain);
-            // ... and resubscribe
-            client.subscribe(controllino);
         }
         // Check if request it to turn off and currently is on
         else if (message.compareTo("off") == 0 && digitalRead(foundPin) == HIGH)
@@ -93,15 +91,11 @@ void callback(char *topic, byte *payload, unsigned int length)
             // Switch the state and publish
             toggle(foundPin);
             client.publish(stateTopic, "off", retain);
-            // ... and resubscribe
-            client.subscribe(controllino);
         }
         else
         {
             // When it is already in desired state, just publish back the state
             client.publish(stateTopic, digitalRead(foundPin) == HIGH ? "on" : "off", retain);
-            // ... and resubscribe
-            client.subscribe(controllino);
         }
     }
 
@@ -116,28 +110,57 @@ void callback(char *topic, byte *payload, unsigned int length)
 
             // Toggle the pin value and Publish the state to the state topic
             client.publish(stateTopic, toggle(foundPin) == HIGH ? "on" : "off", retain);
-            // ... and resubscribe
-            client.subscribe(controllino);
         };
     }
 
-    if (topicStr.indexOf("info") >= 0)
+    if (topicStr.indexOf(homeassistant) >= 0)
     {
-        Serial.println("ACM0 reconnected...'info' command received.");
-        client.publish("ACM0/reconnected", "info accomplished");
-        // ... and resubscribe
-        client.subscribe(controllino);
+        // Check if it is birth or will message
+        if (message.compareTo("online") == 0) {
+            // birth message received
+            Serial.println("Homeassistant went online.");
+            client.publish("ACM1/HA_status", "HA is online");
+
+            // Publish the states of all the entities
+            for (int ale = 0; ale < OUTPUTS_TOTAL; ale++)
+                {
+                    // prepare state topic and payload
+                    String aleStateTopic, aleStatePayload;
+                    aleStateTopic.concat("ACM0/" + c_outputs[ale].entity + "/state");
+                    aleStatePayload.concat(digitalRead(c_outputs[ale].pin) == HIGH ? "on" : "off");
+
+                    // publish ...
+                    client.publish(aleStateTopic.c_str(), aleStatePayload.c_str());
+                }
+
+        } else {
+            // will (or other) message received
+            Serial.println("Homeassistant went offline.");
+            client.publish("ACM1/HA_status", "HA is offline");
+        }
     }
 }
 
 boolean reconnect()
 {
-    if (client.connect("ACM0", user, password))
+    if (client.connect(user, user, password))
     {
         // Once connected, publish an announcement...
         client.publish("ACM0/info", "reconnected");
+        // Publish the states of all the entities
+        for (int ale = 0; ale < OUTPUTS_TOTAL; ale++)
+            {
+                // prepare state topic and payload
+                String aleStateTopic, aleStatePayload;
+                aleStateTopic.concat("ACM0/" + c_outputs[ale].entity + "/state");
+                aleStatePayload.concat(digitalRead(c_outputs[ale].pin) == HIGH ? "on" : "off");
+
+                // publish ...
+                client.publish(aleStateTopic.c_str(), aleStatePayload.c_str());
+            }
         // ... and resubscribe
         client.subscribe(controllino);
+        client.subscribe(homeassistant);
     }
     return client.connected();
 }
@@ -160,8 +183,6 @@ void checkPressedPushButton(Button &btn)
             for (int tt = 0; tt < p_button[p].total_topics; tt++)
             {
                 client.publish(p_button[p].topics[tt], p_button[p].payload);
-                // ... and resubscribe
-                client.subscribe(controllino);
             }
         }
     }
@@ -174,18 +195,16 @@ void setup()
     Serial.println("Init");
 
     /* Setup WatchDog timer */
-    wdt_enable(WDTO_4S);
-
-    // create MQTT
-    client.setServer(server, port);
-    client.setCallback(callback);
-
-    client.subscribe(controllino);
+    wdt_enable(WDTO_8S);
 
     // Setup ethernet
     Ethernet.begin(mac, ip);
     delay(200);
     lastReconnectAttempt = 0;
+
+    // create MQTT
+    client.setServer(server, port);
+    client.setCallback(callback);
 
     // Configure the button as you'd like - not necessary if you're happy with the defaults
     for (int p1 = 0; p1 < PUSH_BUTTONS_TOTAL; p1++)
@@ -237,8 +256,6 @@ void loop()
                 for (int tt = 0; tt < am_button[aBarray].buttons[aB].total_topics; tt++)
                 {
                     client.publish(am_button[aBarray].buttons[aB].topics[tt], am_button[aBarray].buttons[aB].payload);
-                    // ... and resubscribe
-                    client.subscribe(controllino);
                 }
             }
         }
